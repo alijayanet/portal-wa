@@ -1,4 +1,11 @@
 # WhatsAppBot Webportal Pelanggan Saja
+Rekening Donasi Untuk Pembanguanan Masjid
+# 4206 0101 2214 534 BRI an DKM BAITUR ROHMAN <br>
+Info 08194215703 ALIJAYA
+link group tele : https://t.me/alijayaNetAcs
+link chanell tele : https://t.me/alijayaNetwork
+
+# WhatsAppBot Webportal Pelanggan Saja
 
 Versi ringan dari Botlokal yang hanya menggunakan fitur WhatsApp webportal pelanggan saja
 
