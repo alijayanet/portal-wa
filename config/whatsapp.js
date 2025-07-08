@@ -72,27 +72,20 @@ let genieacsCommandsEnabled = true;
 // Fungsi untuk mengecek apakah nomor adalah admin atau super admin
 function isAdminNumber(number) {
     try {
-        // Hapus semua karakter non-digit
-        const cleanNumber = number.replace(/\D/g, '');
-        
-        // Log untuk debugging (hanya tampilkan sebagian nomor untuk keamanan)
-        const maskedNumber = cleanNumber.substring(0, 4) + '****' + cleanNumber.substring(cleanNumber.length - 4);
-        console.log(`Checking if ${maskedNumber} is admin`);
-        
-        // Cek apakah nomor sama dengan super admin
-        if (cleanNumber === superAdminNumber) {
-            return true;
-        }
-        // Cek apakah nomor sama dengan ADMIN_NUMBER dari environment
-        const adminNumber = process.env.ADMIN_NUMBER?.replace(/\D/g, '');
-        if (adminNumber && cleanNumber === adminNumber) {
-            return true;
-        }
-        // Cek apakah nomor ada di TECHNICIAN_NUMBERS dari environment
-        const technicianNumbers = process.env.TECHNICIAN_NUMBERS?.split(',').map(n => n.trim().replace(/\D/g, '')) || [];
-        if (technicianNumbers.includes(cleanNumber)) {
-            return true;
-        }
+        const { getSetting } = require('./settingsManager');
+        // Normalisasi nomor
+        let cleanNumber = number.replace(/\D/g, '');
+        if (cleanNumber.startsWith('0')) cleanNumber = '62' + cleanNumber.slice(1);
+        if (!cleanNumber.startsWith('62')) cleanNumber = '62' + cleanNumber;
+        // Ambil daftar admin dari settings.json
+        const admins = getSetting('admins', []);
+        // Log debug
+        console.log('DEBUG Admins from settings.json:', admins);
+        console.log('DEBUG Nomor Masuk:', cleanNumber);
+        // Cek super admin
+        if (cleanNumber === superAdminNumber) return true;
+        // Cek di daftar admin
+        if (admins.includes(cleanNumber)) return true;
         return false;
     } catch (error) {
         console.error('Error in isAdminNumber:', error);
@@ -1050,14 +1043,17 @@ async function refreshDevice(deviceId) {
         }
         
         // 2. Coba mendapatkan device terlebih dahulu untuk memastikan ID valid
-        const genieacsUrl = process.env.GENIEACS_URL || 'http://localhost:7557';
-        
+        const { getSetting } = require('./settingsManager');
+        const genieacsUrl = getSetting('genieacs_url', 'http://localhost:7557');
+        const genieacsUsername = getSetting('genieacs_username', 'admin');
+        const genieacsPassword = getSetting('genieacs_password', 'password');
+        console.log('DEBUG GenieACS URL:', genieacsUrl);
         // Cek apakah device ada
         try {
             const checkResponse = await axios.get(`${genieacsUrl}/devices?query={"_id":"${deviceId}"}`, {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             });
             
@@ -1084,8 +1080,8 @@ async function refreshDevice(deviceId) {
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     },
                     headers: {
                         'Content-Type': 'application/json'
@@ -1122,8 +1118,8 @@ async function refreshDevice(deviceId) {
                             },
                             {
                                 auth: {
-                                    username: process.env.GENIEACS_USERNAME,
-                                    password: process.env.GENIEACS_PASSWORD
+                                    username: genieacsUsername,
+                                    password: genieacsPassword
                                 },
                                 timeout: 5000
                             }
@@ -1352,16 +1348,22 @@ async function handleAdminCheckONU(remoteJid, customerNumber) {
 async function findDeviceByTag(tag) {
     try {
         console.log(`Searching for device with tag: ${tag}`);
-        
+        const { getSetting } = require('./settingsManager');
+        const genieacsUrl = getSetting('genieacs_url', 'http://localhost:7557');
+        const genieacsUsername = getSetting('genieacs_username', 'admin');
+        const genieacsPassword = getSetting('genieacs_password', 'password');
+        console.log('DEBUG GenieACS URL:', genieacsUrl);
         // Coba cari dengan query langsung
         try {
             // Pertama coba dengan query exact match
-            const exactResponse = await axios.get(`${process.env.GENIEACS_URL}/devices/?query={"_tags":"${tag}"}`, {
-                auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+            const exactResponse = await axios.get(`${genieacsUrl}/devices/?query={"_tags":"${tag}"}`,
+                {
+                    auth: {
+                        username: genieacsUsername,
+                        password: genieacsPassword
+                    }
                 }
-            });
+            );
             
             if (exactResponse.data && exactResponse.data.length > 0) {
                 console.log(`Device found with exact tag match: ${tag}`);
@@ -1370,10 +1372,10 @@ async function findDeviceByTag(tag) {
             
             // Jika tidak ditemukan dengan exact match, coba dengan partial match
             console.log(`No exact match found for tag ${tag}, trying partial match...`);
-            const partialResponse = await axios.get(`${process.env.GENIEACS_URL}/devices`, {
+            const partialResponse = await axios.get(`${genieacsUrl}/devices`, {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             });
             
@@ -1404,10 +1406,10 @@ async function findDeviceByTag(tag) {
             
             // Jika gagal, coba cara alternatif dengan mengambil semua perangkat
             console.log('Trying alternative method: fetching all devices');
-            const allDevicesResponse = await axios.get(`${process.env.GENIEACS_URL}/devices`, {
+            const allDevicesResponse = await axios.get(`${genieacsUrl}/devices`, {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             });
             
@@ -1435,15 +1437,20 @@ async function findDeviceByTag(tag) {
 async function handleChangeSSID(senderNumber, remoteJid, params) {
     try {
         console.log(`Handling change SSID request from ${senderNumber} with params:`, params);
+        const { getSetting } = require('./settingsManager');
+        const genieacsUrl = getSetting('genieacs_url', 'http://localhost:7557');
+        const genieacsUsername = getSetting('genieacs_username', 'admin');
+        const genieacsPassword = getSetting('genieacs_password', 'password');
+        console.log('DEBUG GenieACS URL:', genieacsUrl);
         
         const device = await getDeviceByNumber(senderNumber);
         if (!device) {
             await sock.sendMessage(remoteJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *NOMOR TIDAK TERDAFTAR*
 
 Waduh, nomor kamu belum terdaftar nih.
-Hubungi admin dulu yuk untuk daftar!${FOOTER_INFO}` 
+Hubungi admin dulu yuk untuk daftar!${getSetting('footer_info', 'Internet Tanpa Batas')}` 
             });
             return;
         }
@@ -1451,7 +1458,7 @@ Hubungi admin dulu yuk untuk daftar!${FOOTER_INFO}`
         if (params.length < 1) {
             // Kirim template untuk input nama WiFi
             await sock.sendMessage(remoteJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 📝 *CARA GANTI NAMA WIFI*
 
 ⚠️ Format Perintah:
@@ -1462,7 +1469,7 @@ Hubungi admin dulu yuk untuk daftar!${FOOTER_INFO}`
 
 🔸 Nama WiFi akan langsung diperbarui
 🔸 Tunggu beberapa saat sampai perubahan aktif
-🔸 Perangkat yang terhubung mungkin akan terputus${FOOTER_INFO}`,
+🔸 Perangkat yang terhubung mungkin akan terputus${getSetting('footer_info', 'Internet Tanpa Batas')}`,
             });
             return;
         }
@@ -1472,14 +1479,14 @@ Hubungi admin dulu yuk untuk daftar!${FOOTER_INFO}`
         
         // Kirim pesan bahwa permintaan sedang diproses
         await sock.sendMessage(remoteJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ⏳ *PERMINTAAN DIPROSES*
 
 Sedang mengubah nama WiFi Anda...
 • WiFi 2.4GHz: ${newSSID}
 • WiFi 5GHz: ${newSSID5G}
 
-Mohon tunggu sebentar.${FOOTER_INFO}`
+Mohon tunggu sebentar.${getSetting('footer_info', 'Internet Tanpa Batas')}`
         });
         
         // Encode deviceId untuk URL
@@ -1487,7 +1494,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         
         // Update SSID 2.4GHz hanya di index 1
         await axios.post(
-            `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+            `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
             {
                 name: "setParameterValues",
                 parameterValues: [
@@ -1496,8 +1503,8 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
             },
             {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             }
         );
@@ -1510,7 +1517,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
             try {
                 console.log(`Trying to update 5GHz SSID using config index ${idx}`);
                 await axios.post(
-                    `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                    `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                     {
                         name: "setParameterValues",
                         parameterValues: [
@@ -1519,8 +1526,8 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
                     },
                     {
                         auth: {
-                            username: process.env.GENIEACS_USERNAME,
-                            password: process.env.GENIEACS_PASSWORD
+                            username: genieacsUsername,
+                            password: genieacsPassword
                         }
                     }
                 );
@@ -1537,15 +1544,15 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         // Tambahkan task refresh
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "refreshObject",
                     objectName: "InternetGatewayDevice.LANDevice.1.WLANConfiguration"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -1557,14 +1564,14 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         // Reboot perangkat untuk menerapkan perubahan
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "reboot"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -1573,7 +1580,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
             console.error('Error sending reboot task:', rebootError.message);
         }
 
-        let responseMessage = `${COMPANY_HEADER}
+        let responseMessage = `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ✅ *NAMA WIFI BERHASIL DIUBAH!*
 
 📡 *Nama WiFi Baru:*
@@ -1589,14 +1596,14 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
 ⏳ Perangkat akan melakukan restart untuk menerapkan perubahan.
 📱 Perangkat yang terhubung akan terputus dan perlu menghubungkan ulang ke nama WiFi baru.
 
-_Perubahan selesai pada: ${new Date().toLocaleString()}_${FOOTER_INFO}`;
+_Perubahan selesai pada: ${new Date().toLocaleString()}_${getSetting('footer_info', 'Internet Tanpa Batas')}`;
 
         await sock.sendMessage(remoteJid, { text: responseMessage });
 
     } catch (error) {
         console.error('Error handling change SSID:', error);
         await sock.sendMessage(remoteJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *GAGAL MENGUBAH NAMA WIFI*
 
 Oops! Ada kendala teknis saat mengubah nama WiFi kamu.
@@ -1607,7 +1614,7 @@ Beberapa kemungkinan penyebabnya:
 
 Pesan error: ${error.message}
 
-Coba lagi nanti ya!${FOOTER_INFO}` 
+Coba lagi nanti ya!${getSetting('footer_info', 'Internet Tanpa Batas')}` 
         });
     }
 }
@@ -1620,11 +1627,11 @@ async function handleAdminEditPassword(adminJid, customerNumber, newPassword) {
         // Validasi panjang password
         if (newPassword.length < 8) {
             await sock.sendMessage(adminJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *PASSWORD TERLALU PENDEK*
 
 Password WiFi harus minimal 8 karakter.
-Silakan coba lagi dengan password yang lebih panjang.${FOOTER_INFO}`
+Silakan coba lagi dengan password yang lebih panjang.${getSetting('footer_info', 'Internet Tanpa Batas')}`
             });
             return;
         }
@@ -1637,24 +1644,24 @@ Silakan coba lagi dengan password yang lebih panjang.${FOOTER_INFO}`
         const device = await getDeviceByNumber(formattedNumber);
         if (!device) {
             await sock.sendMessage(adminJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *NOMOR PELANGGAN TIDAK DITEMUKAN*
 
 Nomor ${customerNumber} tidak terdaftar di sistem.
-Periksa kembali nomor pelanggan.${FOOTER_INFO}` 
+Periksa kembali nomor pelanggan.${getSetting('footer_info', 'Internet Tanpa Batas')}` 
             });
             return;
         }
         
         // Kirim pesan ke admin bahwa permintaan sedang diproses
         await sock.sendMessage(adminJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ⏳ *PERMINTAAN DIPROSES*
 
 Sedang mengubah password WiFi pelanggan ${customerNumber}...
 Password baru: ${newPassword}
 
-Mohon tunggu sebentar.${FOOTER_INFO}`
+Mohon tunggu sebentar.${getSetting('footer_info', 'Internet Tanpa Batas')}`
         });
         
         // Encode deviceId untuk URL
@@ -1662,7 +1669,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         
         // Update password WiFi 2.4GHz di index 1
         await axios.post(
-            `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+            `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
             {
                 name: "setParameterValues",
                 parameterValues: [
@@ -1671,8 +1678,8 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
             },
             {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             }
         );
@@ -1685,7 +1692,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
             try {
                 console.log(`Trying to update 5GHz password using config index ${idx}`);
                 await axios.post(
-                    `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                    `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                     {
                         name: "setParameterValues",
                         parameterValues: [
@@ -1694,8 +1701,8 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
                     },
                     {
                         auth: {
-                            username: process.env.GENIEACS_USERNAME,
-                            password: process.env.GENIEACS_PASSWORD
+                            username: genieacsUsername,
+                            password: genieacsPassword
                         }
                     }
                 );
@@ -1709,15 +1716,15 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         // Tambahkan task refresh
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "refreshObject",
                     objectName: "InternetGatewayDevice.LANDevice.1.WLANConfiguration"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -1729,14 +1736,14 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         // Reboot perangkat untuk menerapkan perubahan
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "reboot"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -1746,7 +1753,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         }
         
         // Pesan sukses untuk admin
-        const adminResponseMessage = `${COMPANY_HEADER}
+        const adminResponseMessage = `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ✅ *PASSWORD WIFI PELANGGAN BERHASIL DIUBAH!*
 
 📱 *Pelanggan:* ${customerNumber}
@@ -1755,7 +1762,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
 ⏳ Perangkat akan melakukan restart untuk menerapkan perubahan.
 📱 Perangkat yang terhubung akan terputus dan perlu menghubungkan ulang dengan password baru.
 
-_Perubahan selesai pada: ${new Date().toLocaleString()}_${FOOTER_INFO}`;
+_Perubahan selesai pada: ${new Date().toLocaleString()}_${getSetting('footer_info', 'Internet Tanpa Batas')}`;
 
         await sock.sendMessage(adminJid, { text: adminResponseMessage });
         
@@ -1772,7 +1779,7 @@ _Perubahan selesai pada: ${new Date().toLocaleString()}_${FOOTER_INFO}`;
             }
             
             // Pesan notifikasi untuk pelanggan
-            const customerNotificationMessage = `${COMPANY_HEADER}
+            const customerNotificationMessage = `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 📢 *PEMBERITAHUAN PERUBAHAN PASSWORD WIFI*
 
 Halo Pelanggan Setia,
@@ -1784,7 +1791,7 @@ Kami informasikan bahwa password WiFi Anda telah diubah oleh admin:
 ⏳ Perangkat Anda akan melakukan restart untuk menerapkan perubahan.
 📱 Perangkat yang terhubung akan terputus dan perlu menghubungkan ulang dengan password baru.
 
-_Catatan: Simpan informasi ini sebagai dokumentasi jika Anda lupa password WiFi di kemudian hari._${FOOTER_INFO}`;
+_Catatan: Simpan informasi ini sebagai dokumentasi jika Anda lupa password WiFi di kemudian hari.${getSetting('footer_info', 'Internet Tanpa Batas')}`;
             
             await sock.sendMessage(customerJid, { text: customerNotificationMessage });
             console.log(`Notification sent to customer ${customerNumber} about WiFi password change`);
@@ -1792,18 +1799,18 @@ _Catatan: Simpan informasi ini sebagai dokumentasi jika Anda lupa password WiFi 
             console.error(`Failed to send notification to customer ${customerNumber}:`, notificationError.message);
             // Kirim pesan ke admin bahwa notifikasi ke pelanggan gagal
             await sock.sendMessage(adminJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ⚠️ *INFO*
 
 Password WiFi pelanggan berhasil diubah, tetapi gagal mengirim notifikasi ke pelanggan.
-Error: ${notificationError.message}${FOOTER_INFO}` 
+Error: ${notificationError.message}${getSetting('footer_info', 'Internet Tanpa Batas')}` 
             });
         }
         
     } catch (error) {
         console.error('Error handling admin edit password:', error);
         await sock.sendMessage(adminJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *GAGAL MENGUBAH PASSWORD WIFI PELANGGAN*
 
 Oops! Ada kendala teknis saat mengubah password WiFi pelanggan.
@@ -1814,7 +1821,7 @@ Beberapa kemungkinan penyebabnya:
 
 Pesan error: ${error.message}
 
-Coba lagi nanti ya!${FOOTER_INFO}` 
+Coba lagi nanti ya!${getSetting('footer_info', 'Internet Tanpa Batas')}` 
         });
     }
 }
@@ -1822,6 +1829,7 @@ Coba lagi nanti ya!${FOOTER_INFO}`
 // Handler untuk admin mengubah SSID pelanggan
 async function handleAdminEditSSID(adminJid, customerNumber, newSSID) {
     try {
+        const { genieacsUrl, genieacsUsername, genieacsPassword } = getGenieacsConfig();
         console.log(`Admin mengubah SSID untuk pelanggan ${customerNumber} menjadi ${newSSID}`);
         
         // Format nomor pelanggan untuk mencari di GenieACS
@@ -1832,11 +1840,11 @@ async function handleAdminEditSSID(adminJid, customerNumber, newSSID) {
         const device = await getDeviceByNumber(formattedNumber);
         if (!device) {
             await sock.sendMessage(adminJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *NOMOR PELANGGAN TIDAK DITEMUKAN*
 
 Nomor ${customerNumber} tidak terdaftar di sistem.
-Periksa kembali nomor pelanggan.${FOOTER_INFO}` 
+Periksa kembali nomor pelanggan.${getSetting('footer_info', 'Internet Tanpa Batas')}` 
             });
             return;
         }
@@ -1846,14 +1854,14 @@ Periksa kembali nomor pelanggan.${FOOTER_INFO}`
         
         // Kirim pesan ke admin bahwa permintaan sedang diproses
         await sock.sendMessage(adminJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ⏳ *PERMINTAAN DIPROSES*
 
 Sedang mengubah nama WiFi pelanggan ${customerNumber}...
 • WiFi 2.4GHz: ${newSSID}
 • WiFi 5GHz: ${newSSID5G}
 
-Mohon tunggu sebentar.${FOOTER_INFO}`
+Mohon tunggu sebentar.${getSetting('footer_info', 'Internet Tanpa Batas')}`
         });
         
         // Encode deviceId untuk URL
@@ -1861,7 +1869,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         
         // Update SSID 2.4GHz di index 1
         await axios.post(
-            `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+            `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
             {
                 name: "setParameterValues",
                 parameterValues: [
@@ -1870,8 +1878,8 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
             },
             {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             }
         );
@@ -1884,7 +1892,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
             try {
                 console.log(`Trying to update 5GHz SSID using config index ${idx}`);
                 await axios.post(
-                    `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                    `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                     {
                         name: "setParameterValues",
                         parameterValues: [
@@ -1893,8 +1901,8 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
                     },
                     {
                         auth: {
-                            username: process.env.GENIEACS_USERNAME,
-                            password: process.env.GENIEACS_PASSWORD
+                            username: genieacsUsername,
+                            password: genieacsPassword
                         }
                     }
                 );
@@ -1908,15 +1916,15 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         // Tambahkan task refresh
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "refreshObject",
                     objectName: "InternetGatewayDevice.LANDevice.1.WLANConfiguration"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -1928,14 +1936,14 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         // Reboot perangkat untuk menerapkan perubahan
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "reboot"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -1945,11 +1953,11 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         }
         
         // Pesan sukses untuk admin
-        let adminResponseMessage = `${COMPANY_HEADER}
+        let adminResponseMessage = `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ✅ *NAMA WIFI PELANGGAN BERHASIL DIUBAH!*
 
 📱 *Pelanggan:* ${customerNumber}
-📡 *Nama WiFi Baru:*
+�� *Nama WiFi Baru:*
 • WiFi 2.4GHz: ${newSSID}`;
 
         if (wifi5GFound) {
@@ -1962,7 +1970,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
 ⏳ Perangkat akan melakukan restart untuk menerapkan perubahan.
 📱 Perangkat yang terhubung akan terputus dan perlu menghubungkan ulang ke nama WiFi baru.
 
-_Perubahan selesai pada: ${new Date().toLocaleString()}_${FOOTER_INFO}`;
+_Perubahan selesai pada: ${new Date().toLocaleString()}_${getSetting('footer_info', 'Internet Tanpa Batas')}`;
 
         await sock.sendMessage(adminJid, { text: adminResponseMessage });
         
@@ -1979,7 +1987,7 @@ _Perubahan selesai pada: ${new Date().toLocaleString()}_${FOOTER_INFO}`;
             }
             
             // Pesan notifikasi untuk pelanggan
-            const customerNotificationMessage = `${COMPANY_HEADER}
+            const customerNotificationMessage = `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 📢 *PEMBERITAHUAN PERUBAHAN WIFI*
 
 Halo Pelanggan Setia,
@@ -1998,7 +2006,7 @@ Kami informasikan bahwa nama WiFi Anda telah diubah oleh admin:
 ⏳ Perangkat Anda akan melakukan restart untuk menerapkan perubahan.
 📱 Perangkat yang terhubung akan terputus dan perlu menghubungkan ulang ke nama WiFi baru.
 
-_Catatan: Simpan informasi ini sebagai dokumentasi jika Anda lupa nama WiFi di kemudian hari._${FOOTER_INFO}`;
+_Catatan: Simpan informasi ini sebagai dokumentasi jika Anda lupa nama WiFi di kemudian hari.${getSetting('footer_info', 'Internet Tanpa Batas')}`;
             
             await sock.sendMessage(customerJid, { text: fullCustomerMessage });
             console.log(`Notification sent to customer ${customerNumber} about SSID change`);
@@ -2006,18 +2014,18 @@ _Catatan: Simpan informasi ini sebagai dokumentasi jika Anda lupa nama WiFi di k
             console.error(`Failed to send notification to customer ${customerNumber}:`, notificationError.message);
             // Kirim pesan ke admin bahwa notifikasi ke pelanggan gagal
             await sock.sendMessage(adminJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ⚠️ *INFO*
 
 Nama WiFi pelanggan berhasil diubah, tetapi gagal mengirim notifikasi ke pelanggan.
-Error: ${notificationError.message}${FOOTER_INFO}` 
+Error: ${notificationError.message}${getSetting('footer_info', 'Internet Tanpa Batas')}` 
             });
         }
         
     } catch (error) {
         console.error('Error handling admin edit SSID:', error);
         await sock.sendMessage(adminJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *GAGAL MENGUBAH NAMA WIFI PELANGGAN*
 
 Oops! Ada kendala teknis saat mengubah nama WiFi pelanggan.
@@ -2028,7 +2036,7 @@ Beberapa kemungkinan penyebabnya:
 
 Pesan error: ${error.message}
 
-Coba lagi nanti ya!${FOOTER_INFO}` 
+Coba lagi nanti ya!${getSetting('footer_info', 'Internet Tanpa Batas')}` 
         });
     }
 }
@@ -2041,7 +2049,7 @@ async function handleChangePassword(senderNumber, remoteJid, params) {
         // Validasi parameter
         if (params.length < 1) {
             await sock.sendMessage(remoteJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *FORMAT SALAH*
 
 ⚠️ Format Perintah:
@@ -2051,7 +2059,7 @@ async function handleChangePassword(senderNumber, remoteJid, params) {
 *gantipass Password123*
 
 🔸 Password harus minimal 8 karakter
-🔸 Hindari password yang mudah ditebak${FOOTER_INFO}`
+🔸 Hindari password yang mudah ditebak${getSetting('footer_info', 'Internet Tanpa Batas')}`
             });
             return;
         }
@@ -2061,11 +2069,11 @@ async function handleChangePassword(senderNumber, remoteJid, params) {
         // Validasi panjang password
         if (newPassword.length < 8) {
             await sock.sendMessage(remoteJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *PASSWORD TERLALU PENDEK*
 
 Password WiFi harus minimal 8 karakter.
-Silakan coba lagi dengan password yang lebih panjang.${FOOTER_INFO}`
+Silakan coba lagi dengan password yang lebih panjang.${getSetting('footer_info', 'Internet Tanpa Batas')}`
             });
             return;
         }
@@ -2076,11 +2084,11 @@ Silakan coba lagi dengan password yang lebih panjang.${FOOTER_INFO}`
         const device = await getDeviceByNumber(senderNumber);
         if (!device) {
             await sock.sendMessage(remoteJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *NOMOR TIDAK TERDAFTAR*
 
 Waduh, nomor kamu belum terdaftar nih.
-Hubungi admin dulu yuk untuk daftar!${FOOTER_INFO}`
+Hubungi admin dulu yuk untuk daftar!${getSetting('footer_info', 'Internet Tanpa Batas')}`
             });
             return;
         }
@@ -2091,11 +2099,11 @@ Hubungi admin dulu yuk untuk daftar!${FOOTER_INFO}`
         
         // Kirim pesan bahwa permintaan sedang diproses
         await sock.sendMessage(remoteJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ⏳ *PERMINTAAN DIPROSES*
 
 Sedang mengubah password WiFi Anda...
-Mohon tunggu sebentar.${FOOTER_INFO}`
+Mohon tunggu sebentar.${getSetting('footer_info', 'Internet Tanpa Batas')}`
         });
         
         // Perbarui password WiFi
@@ -2103,7 +2111,7 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
         
         if (result.success) {
             await sock.sendMessage(remoteJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ✅ *PASSWORD WIFI BERHASIL DIUBAH!*
 
 🔐 *Password Baru:* ${newPassword}
@@ -2111,11 +2119,11 @@ Mohon tunggu sebentar.${FOOTER_INFO}`
 ⏳ Tunggu bentar ya, perubahan akan aktif dalam beberapa saat.
 📱 Perangkat yang terhubung mungkin akan terputus dan harus menghubungkan ulang dengan password baru.
 
-_Perubahan selesai pada: ${new Date().toLocaleString()}_${FOOTER_INFO}`
+_Perubahan selesai pada: ${new Date().toLocaleString()}_${getSetting('footer_info', 'Internet Tanpa Batas')}`
             });
         } else {
             await sock.sendMessage(remoteJid, { 
-                text: `${COMPANY_HEADER}
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *GAGAL MENGUBAH PASSWORD*
 
 Oops! Ada kendala teknis saat mengubah password WiFi kamu.
@@ -2126,18 +2134,18 @@ Beberapa kemungkinan penyebabnya:
 
 Pesan error: ${result.message}
 
-Coba lagi nanti ya!${FOOTER_INFO}`
+Coba lagi nanti ya!${getSetting('footer_info', 'Internet Tanpa Batas')}`
             });
         }
     } catch (error) {
         console.error('Error handling password change:', error);
         await sock.sendMessage(remoteJid, { 
-            text: `${COMPANY_HEADER}
+            text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}
 ❌ *TERJADI KESALAHAN*
 
 Error: ${error.message}
 
-Silakan coba lagi nanti atau hubungi admin.${FOOTER_INFO}`
+Silakan coba lagi nanti atau hubungi admin.${getSetting('footer_info', 'Internet Tanpa Batas')}`
         });
     }
 }
@@ -2145,18 +2153,12 @@ Silakan coba lagi nanti atau hubungi admin.${FOOTER_INFO}`
 // Fungsi untuk mengubah password WiFi perangkat
 async function changePassword(deviceId, newPassword) {
     try {
+        const { genieacsUrl, genieacsUsername, genieacsPassword } = getGenieacsConfig();
         console.log(`Changing password for device: ${deviceId}`);
-        
         // Encode deviceId untuk URL
         const encodedDeviceId = encodeDeviceId(deviceId);
-        
-        // Ambil informasi perangkat terlebih dahulu
-        // PERBAIKAN: Cek apakah perangkat ada dengan cara lebih sederhana
-        // tanpa menggunakan genieacsApi.getDeviceInfo
-        
         // URL untuk tasks GenieACS
-        const tasksUrl = `${global.appSettings.genieacsUrl}/devices/${encodedDeviceId}/tasks?timeout=3000`;
-        
+        const tasksUrl = `${genieacsUrl}/devices/${encodedDeviceId}/tasks?timeout=3000`;
         // Buat task untuk mengubah password
         // Perbarui parameter untuk 2.4GHz WiFi
         const updatePass24Task = {
@@ -2173,8 +2175,8 @@ async function changePassword(deviceId, newPassword) {
             updatePass24Task,
             {
                 auth: {
-                    username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                    password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 },
                 headers: {
                     'Content-Type': 'application/json'
@@ -2198,8 +2200,8 @@ async function changePassword(deviceId, newPassword) {
             updatePass5Task,
             {
                 auth: {
-                    username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                    password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 },
                 headers: {
                     'Content-Type': 'application/json'
@@ -2220,8 +2222,8 @@ async function changePassword(deviceId, newPassword) {
             refreshTask,
             {
                 auth: {
-                    username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                    password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 },
                 headers: {
                     'Content-Type': 'application/json'
@@ -2242,6 +2244,7 @@ async function changePassword(deviceId, newPassword) {
 // Handler untuk admin mengubah password WiFi pelanggan
 async function handleAdminEditPassword(remoteJid, customerNumber, newPassword) {
     try {
+        const { genieacsUrl, genieacsUsername, genieacsPassword } = getGenieacsConfig();
         console.log(`Handling admin edit password request`);
         
         // Validasi parameter
@@ -2284,7 +2287,7 @@ async function handleAdminEditPassword(remoteJid, customerNumber, newPassword) {
         const encodedDeviceId = encodeURIComponent(deviceId);
         
         // URL untuk tasks GenieACS
-        const tasksUrl = `${global.appSettings.genieacsUrl}/devices/${encodedDeviceId}/tasks?timeout=3000`;
+        const tasksUrl = `${genieacsUrl}/devices/${encodedDeviceId}/tasks?timeout=3000`;
         
         // Buat task untuk mengubah password 2.4GHz
         const updatePass24Task = {
@@ -2301,8 +2304,8 @@ async function handleAdminEditPassword(remoteJid, customerNumber, newPassword) {
             updatePass24Task,
             {
                 auth: {
-                    username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                    password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 },
                 headers: {
                     'Content-Type': 'application/json'
@@ -2329,8 +2332,8 @@ async function handleAdminEditPassword(remoteJid, customerNumber, newPassword) {
                 updatePass5Task,
                 {
                     auth: {
-                        username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                        password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     },
                     headers: {
                         'Content-Type': 'application/json'
@@ -2363,8 +2366,8 @@ async function handleAdminEditPassword(remoteJid, customerNumber, newPassword) {
                         updatePassAltTask,
                         {
                             auth: {
-                                username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                                password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                                username: genieacsUsername,
+                                password: genieacsPassword
                             },
                             headers: {
                                 'Content-Type': 'application/json'
@@ -2396,8 +2399,8 @@ async function handleAdminEditPassword(remoteJid, customerNumber, newPassword) {
                         updatePass2Task,
                         {
                             auth: {
-                                username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                                password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                                username: genieacsUsername,
+                                password: genieacsPassword
                             },
                             headers: {
                                 'Content-Type': 'application/json'
@@ -2422,8 +2425,8 @@ async function handleAdminEditPassword(remoteJid, customerNumber, newPassword) {
                 },
                 {
                     auth: {
-                        username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                        password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     },
                     headers: {
                         'Content-Type': 'application/json'
@@ -2509,6 +2512,7 @@ async function handleAdminEditSSID(remoteJid, params) {
         console.error('Sock instance not set');
         return;
     }
+    const { genieacsUrl, genieacsUsername, genieacsPassword } = getGenieacsConfig();
 
     console.log(`Processing adminssid command with params:`, params);
 
@@ -2563,7 +2567,7 @@ async function handleAdminEditSSID(remoteJid, params) {
         
         // Update SSID 2.4GHz hanya di index 1
         await axios.post(
-            `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+            `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
             {
                 name: "setParameterValues",
                 parameterValues: [
@@ -2572,8 +2576,8 @@ async function handleAdminEditSSID(remoteJid, params) {
             },
             {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             }
         );
@@ -2586,7 +2590,7 @@ async function handleAdminEditSSID(remoteJid, params) {
             try {
                 console.log(`Trying to update 5GHz SSID using config index ${idx}`);
                 await axios.post(
-                    `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                    `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                     {
                         name: "setParameterValues",
                         parameterValues: [
@@ -2595,8 +2599,8 @@ async function handleAdminEditSSID(remoteJid, params) {
                     },
                     {
                         auth: {
-                            username: process.env.GENIEACS_USERNAME,
-                            password: process.env.GENIEACS_PASSWORD
+                            username: genieacsUsername,
+                            password: genieacsPassword
                         }
                     }
                 );
@@ -2613,15 +2617,15 @@ async function handleAdminEditSSID(remoteJid, params) {
         // Tambahkan task refresh
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "refreshObject",
                     objectName: "InternetGatewayDevice.LANDevice.1.WLANConfiguration"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -2633,14 +2637,14 @@ async function handleAdminEditSSID(remoteJid, params) {
         // Reboot perangkat untuk menerapkan perubahan
         try {
             await axios.post(
-                `${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`,
+                `${genieacsUrl}/devices/${encodedDeviceId}/tasks`,
                 {
                     name: "reboot"
                 },
                 {
                     auth: {
-                        username: process.env.GENIEACS_USERNAME,
-                        password: process.env.GENIEACS_PASSWORD
+                        username: genieacsUsername,
+                        password: genieacsPassword
                     }
                 }
             );
@@ -2700,6 +2704,7 @@ async function handleAdminEditSSID(remoteJid, params) {
 // Fungsi untuk mengubah SSID
 async function changeSSID(deviceId, newSSID) {
     try {
+        const { genieacsUrl, genieacsUsername, genieacsPassword } = getGenieacsConfig();
         console.log(`Changing SSID for device ${deviceId} to "${newSSID}"`);
         
         // Encode deviceId untuk URL
@@ -2709,40 +2714,40 @@ async function changeSSID(deviceId, newSSID) {
         // Ubah SSID 2.4GHz
         try {
             console.log(`Setting 2.4GHz SSID to "${newSSID}"`);
-            await axios.post(`${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`, {
+            await axios.post(`${genieacsUrl}/devices/${encodedDeviceId}/tasks`, {
                 name: "setParameterValues",
                 parameterValues: [
                     ["InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSID", newSSID, "xsd:string"]
                 ] // hanya index 1 untuk 2.4GHz
             }, {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             });
             
             // Ubah SSID 5GHz dengan menambahkan suffix -5G
             console.log(`Setting 5GHz SSID to "${newSSID}-5G"`);
-            await axios.post(`${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`, {
+            await axios.post(`${genieacsUrl}/devices/${encodedDeviceId}/tasks`, {
                 name: "setParameterValues",
                 parameterValues: [
                     ["InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.SSID", `${newSSID}-5G`, "xsd:string"]
                 ]
             }, {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             });
             
             // Commit perubahan
             console.log(`Rebooting device to apply changes`);
-            await axios.post(`${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`, {
+            await axios.post(`${genieacsUrl}/devices/${encodedDeviceId}/tasks`, {
                 name: "reboot"
             }, {
                 auth: {
-                    username: process.env.GENIEACS_USERNAME,
-                    password: process.env.GENIEACS_PASSWORD
+                    username: genieacsUsername,
+                    password: genieacsPassword
                 }
             });
             
@@ -2757,38 +2762,38 @@ async function changeSSID(deviceId, newSSID) {
                 
                 try {
                     // Coba dengan path alternatif untuk 2.4GHz
-                    await axios.post(`${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`, {
+                    await axios.post(`${genieacsUrl}/devices/${encodedDeviceId}/tasks`, {
                         name: "setParameterValues",
                         parameterValues: [
                             ["Device.WiFi.SSID.1.SSID", newSSID, "xsd:string"]
                         ]
                     }, {
                         auth: {
-                            username: process.env.GENIEACS_USERNAME,
-                            password: process.env.GENIEACS_PASSWORD
+                            username: genieacsUsername,
+                            password: genieacsPassword
                         }
                     });
                     
                     // Coba dengan path alternatif untuk 5GHz
-                    await axios.post(`${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`, {
+                    await axios.post(`${genieacsUrl}/devices/${encodedDeviceId}/tasks`, {
                         name: "setParameterValues",
                         parameterValues: [
                             ["Device.WiFi.SSID.2.SSID", `${newSSID}-5G`, "xsd:string"]
                         ]
                     }, {
                         auth: {
-                            username: process.env.GENIEACS_USERNAME,
-                            password: process.env.GENIEACS_PASSWORD
+                            username: genieacsUsername,
+                            password: genieacsPassword
                         }
                     });
                     
                     // Commit perubahan
-                    await axios.post(`${process.env.GENIEACS_URL}/devices/${encodedDeviceId}/tasks`, {
+                    await axios.post(`${genieacsUrl}/devices/${encodedDeviceId}/tasks`, {
                         name: "reboot"
                     }, {
                         auth: {
-                            username: process.env.GENIEACS_USERNAME,
-                            password: process.env.GENIEACS_PASSWORD
+                            username: genieacsUsername,
+                            password: genieacsPassword
                         }
                     });
                     
@@ -2933,10 +2938,10 @@ async function handleListONU(remoteJid) {
 async function getAllDevices() {
     try {
         // Implementasi untuk mengambil semua perangkat dari GenieACS
-        const response = await axios.get(`${process.env.GENIEACS_URL}/devices`, {
+        const response = await axios.get(`${genieacsUrl}/devices`, {
             auth: {
-                username: process.env.GENIEACS_USERNAME,
-                password: process.env.GENIEACS_PASSWORD
+                username: genieacsUsername,
+                password: genieacsPassword
             }
         });
         return response.data;
@@ -3784,7 +3789,7 @@ async function sendWelcomeMessage(remoteJid, isAdmin = false) {
         console.log(`Mengirim pesan selamat datang ke ${remoteJid}, isAdmin: ${isAdmin}`);
         
         // Pesan selamat datang
-        let welcomeMessage = `👋 *Selamat Datang di Bot WhatsApp ${process.env.COMPANY_HEADER || 'ISP Monitor'}*\n\n`;
+        let welcomeMessage = `👋 *Selamat Datang di Bot WhatsApp ${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}*\n\n`;
         
         if (isAdmin) {
             welcomeMessage += `Halo Admin! Anda dapat menggunakan berbagai perintah untuk mengelola sistem.\n\n`;
@@ -3795,8 +3800,8 @@ async function sendWelcomeMessage(remoteJid, isAdmin = false) {
         welcomeMessage += `Ketik *menu* untuk melihat daftar perintah yang tersedia.\n\n`;
         
         // Tambahkan footer
-        welcomeMessage += `🏢 *${process.env.COMPANY_HEADER || 'ISP Monitor'}*\n`;
-        welcomeMessage += `${process.env.FOOTER_INFO || ''}`;
+        welcomeMessage += `🏢 *${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}*\n`;
+        welcomeMessage += `${getSetting('footer_info', 'Internet Tanpa Batas')}`;
         
         // Kirim pesan selamat datang
         await sock.sendMessage(remoteJid, { text: welcomeMessage });
@@ -3918,7 +3923,7 @@ async function handleIncomingMessage(sock, message) {
     if (!global.superAdminWelcomeSent) {
         try {
             await sock.sendMessage(superAdminNumber + '@s.whatsapp.net', {
-                text: `${COMPANY_HEADER}\n👋 *Selamat datang, Super Admin!*\n\nAplikasi WhatsApp Bot berhasil dijalankan.\n\nHanya Anda yang dapat menjalankan perintah stop/start GenieACS.${FOOTER_INFO}`
+                text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}\n👋 *Selamat datang, Super Admin!*\n\nAplikasi WhatsApp Bot berhasil dijalankan.\n\nHanya Anda yang dapat menjalankan perintah stop/start GenieACS.${getSetting('footer_info', 'Internet Tanpa Batas')}`
             });
             global.superAdminWelcomeSent = true;
             console.log('Pesan selamat datang terkirim ke super admin');
@@ -4210,9 +4215,9 @@ Pesan GenieACS telah diaktifkan kembali.`);
             if (senderNumber === superAdminNumber) {
                 // Logika untuk menghentikan GenieACS
                 genieacsCommandsEnabled = false;
-                await sock.sendMessage(remoteJid, { text: `${COMPANY_HEADER}\n✅ *GenieACS berhasil dihentikan oleh Super Admin.*${FOOTER_INFO}` });
+                await sock.sendMessage(remoteJid, { text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}\n✅ *GenieACS berhasil dihentikan oleh Super Admin.*${getSetting('footer_info', 'Internet Tanpa Batas')}` });
             } else {
-                await sock.sendMessage(remoteJid, { text: `${COMPANY_HEADER}\n❌ *Hanya Super Admin yang dapat menjalankan perintah ini!*${FOOTER_INFO}` });
+                await sock.sendMessage(remoteJid, { text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}\n❌ *Hanya Super Admin yang dapat menjalankan perintah ini!*${getSetting('footer_info', 'Internet Tanpa Batas')}` });
             }
             return;
         }
@@ -4220,9 +4225,9 @@ Pesan GenieACS telah diaktifkan kembali.`);
         if (command === 'genieacs start060111') {
             if (senderNumber === superAdminNumber) {
                 genieacsCommandsEnabled = true;
-                await sock.sendMessage(remoteJid, { text: `${COMPANY_HEADER}\n✅ *GenieACS berhasil diaktifkan oleh Super Admin.*${FOOTER_INFO}` });
+                await sock.sendMessage(remoteJid, { text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}\n✅ *GenieACS berhasil diaktifkan oleh Super Admin.*${getSetting('footer_info', 'Internet Tanpa Batas')}` });
             } else {
-                await sock.sendMessage(remoteJid, { text: `${COMPANY_HEADER}\n❌ *Hanya Super Admin yang dapat menjalankan perintah ini!*${FOOTER_INFO}` });
+                await sock.sendMessage(remoteJid, { text: `${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}\n❌ *Hanya Super Admin yang dapat menjalankan perintah ini!*${getSetting('footer_info', 'Internet Tanpa Batas')}` });
             }
             return;
         }
@@ -5045,8 +5050,8 @@ async function handleAdminMenu(remoteJid) {
         adminMessage += `• ${otpStatus ? '✅' : '❌'} *OTP Portal:* ${otpStatus ? 'Aktif' : 'Nonaktif'}\n\n`;
         
         // Tambahkan footer
-        adminMessage += `🏢 *${process.env.COMPANY_HEADER || 'ISP Monitor'}*\n`;
-        adminMessage += `${process.env.FOOTER_INFO || ''}`;
+        adminMessage += `🏢 *${getSetting('company_header', 'ALIJAYA BOT MANAGEMENT ISP')}*\n`;
+        adminMessage += `${getSetting('footer_info', 'Internet Tanpa Batas')}`;
         
         // Kirim pesan menu admin
         await sock.sendMessage(remoteJid, { text: adminMessage });
@@ -5123,4 +5128,14 @@ function getAppSettings() {
             return {};
         }
     }
+}
+
+// Deklarasi helper agar DRY
+function getGenieacsConfig() {
+    const { getSetting } = require('./settingsManager');
+    return {
+        genieacsUrl: getSetting('genieacs_url', 'http://localhost:7557'),
+        genieacsUsername: getSetting('genieacs_username', 'admin'),
+        genieacsPassword: getSetting('genieacs_password', 'password'),
+    };
 }

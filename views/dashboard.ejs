@@ -252,6 +252,16 @@
     .table th, .table td {
       padding: 8px 4px;
     }
+    .input-group-responsive {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .input-group-responsive input,
+    .input-group-responsive button {
+      width: 100% !important;
+      min-width: 0;
+      border-radius: 8px !important;
+    }
   }
   </style>
 </head>
@@ -380,9 +390,9 @@
       <div class="form-section">
         <h6><i class="bi bi-wifi"></i>Ganti Nama WiFi (SSID)</h6>
         <form method="POST" action="/customer/change-ssid">
-          <div class="input-group">
-            <input type="text" class="form-control" name="ssid" placeholder="Nama WiFi baru" required maxlength="32">
-            <button class="btn btn-action btn-ssid" type="submit">
+          <div class="input-group input-group-responsive">
+            <input type="text" class="form-control w-100" name="ssid" placeholder="Nama WiFi baru" required maxlength="32">
+            <button class="btn btn-action btn-ssid w-100" type="submit">
               <i class="bi bi-check-lg me-1"></i>Ganti SSID
             </button>
           </div>
@@ -392,9 +402,9 @@
       <div class="form-section">
         <h6><i class="bi bi-shield-lock"></i>Ganti Password WiFi</h6>
         <form method="POST" action="/customer/change-password">
-          <div class="input-group">
-            <input type="text" class="form-control" name="password" placeholder="Password baru" required maxlength="32">
-            <button class="btn btn-action btn-password" type="submit">
+          <div class="input-group input-group-responsive">
+            <input type="text" class="form-control w-100" name="password" placeholder="Password baru" required maxlength="32">
+            <button class="btn btn-action btn-password w-100" type="submit">
               <i class="bi bi-check-lg me-1"></i>Ganti Password
             </button>
           </div>

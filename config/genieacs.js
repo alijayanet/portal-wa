@@ -3,30 +3,32 @@ require('dotenv').config();
 const { sendTechnicianMessage } = require('./sendMessage');
 const mikrotik = require('./mikrotik');
 const { getMikrotikConnection } = require('./mikrotik');
+const { getSetting } = require('./settingsManager');
 
-// Konfigurasi GenieACS API
-const GENIEACS_URL = process.env.GENIEACS_URL || 'http://localhost:7557';
-const GENIEACS_USERNAME = process.env.GENIEACS_USERNAME;
-const GENIEACS_PASSWORD = process.env.GENIEACS_PASSWORD;
-
-// Buat instance axios dengan konfigurasi default
-const axiosInstance = axios.create({
-    baseURL: GENIEACS_URL,
-    auth: {
-        username: GENIEACS_USERNAME,
-        password: GENIEACS_PASSWORD
-    },
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    }
-});
+// Helper untuk membuat axios instance dinamis
+function getAxiosInstance() {
+    const GENIEACS_URL = getSetting('genieacs_url', 'http://localhost:7557');
+    const GENIEACS_USERNAME = getSetting('genieacs_username', 'admin');
+    const GENIEACS_PASSWORD = getSetting('genieacs_password', 'admin');
+    return axios.create({
+        baseURL: GENIEACS_URL,
+        auth: {
+            username: GENIEACS_USERNAME,
+            password: GENIEACS_PASSWORD
+        },
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+}
 
 // GenieACS API wrapper
 const genieacsApi = {
     async getDevices() {
         try {
             console.log('Getting all devices...');
+            const axiosInstance = getAxiosInstance();
             const response = await axiosInstance.get('/devices');
             console.log(`Found ${response.data?.length || 0} devices`);
             return response.data;
@@ -38,6 +40,7 @@ const genieacsApi = {
 
     async findDeviceByPhoneNumber(phoneNumber) {
         try {
+            const axiosInstance = getAxiosInstance();
             // Mencari device berdasarkan tag yang berisi nomor telepon
             const response = await axiosInstance.get('/devices', {
                 params: {
@@ -70,6 +73,7 @@ const genieacsApi = {
 
     async getDevice(deviceId) {
         try {
+            const axiosInstance = getAxiosInstance();
             const response = await axiosInstance.get(`/devices/${encodeURIComponent(deviceId)}`);
             return response.data;
         } catch (error) {
@@ -81,7 +85,7 @@ const genieacsApi = {
     async setParameterValues(deviceId, parameters) {
         try {
             console.log('Setting parameters for device:', deviceId, parameters);
-
+            const axiosInstance = getAxiosInstance();
             // Format parameter values untuk GenieACS
             const parameterValues = [];
             for (const [path, value] of Object.entries(parameters)) {
@@ -143,6 +147,7 @@ const genieacsApi = {
 
     async reboot(deviceId) {
         try {
+            const axiosInstance = getAxiosInstance();
             const task = {
                 name: "reboot",
                 timestamp: new Date().toISOString()
@@ -160,6 +165,7 @@ const genieacsApi = {
 
     async factoryReset(deviceId) {
         try {
+            const axiosInstance = getAxiosInstance();
             const task = {
                 name: "factoryReset",
                 timestamp: new Date().toISOString()
@@ -177,6 +183,7 @@ const genieacsApi = {
 
     async getDeviceParameters(deviceId, parameterNames) {
         try {
+            const axiosInstance = getAxiosInstance();
             const queryString = parameterNames.map(name => `query=${encodeURIComponent(name)}`).join('&');
             const response = await axiosInstance.get(`/devices/${encodeURIComponent(deviceId)}?${queryString}`);
             return response.data;
@@ -189,7 +196,9 @@ const genieacsApi = {
     async getDeviceInfo(deviceId) {
         try {
             console.log(`Getting device info for device ID: ${deviceId}`);
-            
+            const GENIEACS_URL = getSetting('genieacs_url', 'http://localhost:7557');
+            const GENIEACS_USERNAME = getSetting('genieacs_username', 'admin');
+            const GENIEACS_PASSWORD = getSetting('genieacs_password', 'admin');
             // Mendapatkan device detail
             const deviceResponse = await axios.get(`${GENIEACS_URL}/devices/${encodeURIComponent(deviceId)}`, {
                 auth: {
@@ -197,92 +206,21 @@ const genieacsApi = {
                     password: GENIEACS_PASSWORD
                 }
             });
-
-            if (!deviceResponse.data) {
-                console.error('No device data found');
-                return null;
-            }
-
-            console.log('Device data retrieved successfully');
             return deviceResponse.data;
         } catch (error) {
-            console.error('Error getting device info:', error.response?.data || error.message);
-            return null;
+            console.error(`Error getting device info for ${deviceId}:`, error.response?.data || error.message);
+            throw error;
         }
     },
 
     async getVirtualParameters(deviceId) {
         try {
-            console.log(`Getting virtual parameters for device ID: ${deviceId}`);
-            
-            const virtualParams = [
-                // Serial Number
-                'InternetGatewayDevice.DeviceInfo.SerialNumber',
-                'Device.DeviceInfo.SerialNumber',
-                'VirtualParameters.getSerialNumber',
-                
-                // Device Uptime
-                'InternetGatewayDevice.DeviceInfo.UpTime',
-                'Device.DeviceInfo.UpTime',
-                'VirtualParameters.getdeviceuptime',
-                
-                // PPPoE Uptime
-                'InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANPPPConnection.1.UpTime',
-                'Device.PPP.Interface.1.UpTime',
-                'VirtualParameters.getpppuptime',
-                
-                // Active Devices
-                'InternetGatewayDevice.LANDevice.1.Hosts.HostNumberOfEntries',
-                'InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalAssociations',
-                'Device.Hosts.HostNumberOfEntries',
-                'VirtualParameters.activedevices',
-                'VirtualParameters.getactivedevices',
-                
-                // RX Power
-                'InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.XPON.RxPower',
-                'Device.XPON.Interface.1.RxPower',
-                'VirtualParameters.RXPower',
-                'VirtualParameters.redaman',
-                
-                // PON MAC
-                'InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.MACAddress',
-                'Device.Ethernet.Interface.1.MACAddress',
-                'VirtualParameters.PonMac',
-                
-                // WAN IP
-                'InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ExternalIPAddress',
-                'Device.IP.Interface.1.IPv4Address.1.IPAddress',
-                'VirtualParameters.WanIP',
-                
-                // PPP IP
-                'InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANPPPConnection.1.ExternalIPAddress',
-                'Device.PPP.Interface.1.IPCP.LocalIPAddress',
-                'VirtualParameters.pppIP',
-                'VirtualParameters.pppoeIP',
-                
-                // Temperature
-                'InternetGatewayDevice.DeviceInfo.Temperature',
-                'Device.DeviceInfo.Temperature',
-                'VirtualParameters.gettemp'
-            ];
-
-            // Menggunakan tasks endpoint untuk mendapatkan parameter values
-            const response = await axios.post(`${GENIEACS_URL}/tasks`, [{
-                name: "getParameterValues",
-                parameterNames: virtualParams,
-                device: deviceId
-            }], {
-                auth: {
-                    username: GENIEACS_USERNAME,
-                    password: GENIEACS_PASSWORD
-                }
-            });
-
-            console.log('Virtual parameters retrieved successfully');
-            return response.data;
+            const axiosInstance = getAxiosInstance();
+            const response = await axiosInstance.get(`/devices/${encodeURIComponent(deviceId)}`);
+            return response.data.VirtualParameters || {};
         } catch (error) {
-            console.error('Error getting virtual parameters:', error.response?.data || error.message);
-            return null;
+            console.error(`Error getting virtual parameters for device ${deviceId}:`, error.response?.data || error.message);
+            throw error;
         }
     },
 };

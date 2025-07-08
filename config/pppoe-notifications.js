@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { logger } = require('./logger');
 const { getMikrotikConnection } = require('./mikrotik');
+const { getSetting, setSetting } = require('./settingsManager');
 
 // Path untuk menyimpan pengaturan notifikasi
 const settingsPath = path.join(__dirname, '..', 'pppoe-notification-settings.json');
@@ -29,19 +30,16 @@ function setSock(sockInstance) {
     logger.info('WhatsApp socket set in pppoe-notifications module');
 }
 
-// Load settings from file
-function loadSettings() {
-    try {
-        if (fs.existsSync(settingsPath)) {
-            const data = fs.readFileSync(settingsPath, 'utf8');
-            const settings = JSON.parse(data);
-            return { ...defaultSettings, ...settings };
-        }
-        return defaultSettings;
-    } catch (error) {
-        logger.error(`Error loading PPPoE notification settings: ${error.message}`);
-        return defaultSettings;
-    }
+// Fungsi untuk mendapatkan pengaturan notifikasi PPPoE dari settings.json
+function getPPPoENotificationSettings() {
+    return getSetting('pppoe_notifications', {
+        enabled: true,
+        loginNotifications: true,
+        logoutNotifications: true,
+        includeOfflineList: true,
+        maxOfflineListCount: 20,
+        monitorInterval: 60000
+    });
 }
 
 // Save settings to file
@@ -58,14 +56,14 @@ function saveSettings(settings) {
 
 // Get current settings
 function getSettings() {
-    return loadSettings();
+    return getPPPoENotificationSettings();
 }
 
 // Update settings
 function updateSettings(newSettings) {
-    const currentSettings = loadSettings();
+    const currentSettings = getPPPoENotificationSettings();
     const updatedSettings = { ...currentSettings, ...newSettings };
-    return saveSettings(updatedSettings);
+    return setSetting('pppoe_notifications', updatedSettings);
 }
 
 // Enable/disable notifications
@@ -248,7 +246,7 @@ async function sendNotification(message) {
         return false;
     }
 
-    const settings = loadSettings();
+    const settings = getPPPoENotificationSettings();
     if (!settings.enabled) {
         logger.info('PPPoE notifications are disabled');
         return false;
@@ -365,7 +363,7 @@ async function getOfflinePPPoEUsers(activeUsers) {
 
 // Format login notification message
 function formatLoginMessage(loginUsers, connections, offlineUsers) {
-    const settings = loadSettings();
+    const settings = getPPPoENotificationSettings();
     let message = `🔔 *PPPoE LOGIN NOTIFICATION*\n\n`;
     
     message += `📊 *User Login (${loginUsers.length}):*\n`;
@@ -399,7 +397,7 @@ function formatLoginMessage(loginUsers, connections, offlineUsers) {
 
 // Format logout notification message
 function formatLogoutMessage(logoutUsers, offlineUsers) {
-    const settings = loadSettings();
+    const settings = getPPPoENotificationSettings();
     let message = `🚪 *PPPoE LOGOUT NOTIFICATION*\n\n`;
     
     message += `📊 *User Logout (${logoutUsers.length}):*\n`;
@@ -427,10 +425,7 @@ function formatLogoutMessage(logoutUsers, offlineUsers) {
 
 module.exports = {
     setSock,
-    loadSettings,
-    saveSettings,
-    getSettings,
-    updateSettings,
+    getPPPoENotificationSettings,
     setNotificationStatus,
     setLoginNotifications,
     setLogoutNotifications,

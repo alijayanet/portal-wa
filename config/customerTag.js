@@ -2,6 +2,7 @@
 const axios = require('axios');
 require('dotenv').config();
 const { logger } = require('./logger');
+const { getSetting } = require('./settingsManager');
 
 let sock = null;
 
@@ -32,7 +33,7 @@ async function addCustomerTag(remoteJid, params) {
         }
         
         // Dapatkan URL GenieACS
-        const genieacsUrl = global.appSettings.genieacsUrl || process.env.GENIEACS_URL;
+        const genieacsUrl = getSetting('genieacs_url', 'http://localhost:7557');
         if (!genieacsUrl) {
             await sock.sendMessage(remoteJid, {
                 text: `❌ *Konfigurasi tidak lengkap*\n\nURL GenieACS tidak dikonfigurasi`
@@ -55,8 +56,8 @@ async function addCustomerTag(remoteJid, params) {
                 {},
                 {
                     auth: {
-                        username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                        password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                        username: getSetting('genieacs_username', 'admin'),
+                        password: getSetting('genieacs_password', 'admin')
                     }
                 }
             );
@@ -98,7 +99,7 @@ async function addCustomerTag(remoteJid, params) {
 async function findDeviceById(deviceId) {
     try {
         // Dapatkan URL GenieACS
-        const genieacsUrl = global.appSettings.genieacsUrl || process.env.GENIEACS_URL;
+        const genieacsUrl = getSetting('genieacs_url', 'http://localhost:7557');
         if (!genieacsUrl) {
             logger.error('GenieACS URL not configured');
             return null;
@@ -112,8 +113,8 @@ async function findDeviceById(deviceId) {
         // Ambil perangkat dari GenieACS
         const response = await axios.get(`${genieacsUrl}/devices/?query=${encodedQuery}`, {
             auth: {
-                username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                username: getSetting('genieacs_username', 'admin'),
+                password: getSetting('genieacs_password', 'admin')
             },
             headers: {
                 'Accept': 'application/json'
@@ -153,7 +154,7 @@ async function addTagByPPPoE(remoteJid, params, sock) {
         }
         
         // Dapatkan URL GenieACS
-        const genieacsUrl = global.appSettings.genieacsUrl || process.env.GENIEACS_URL;
+        const genieacsUrl = getSetting('genieacs_url', 'http://localhost:7557');
         if (!genieacsUrl) {
             await sock.sendMessage(remoteJid, {
                 text: `❌ *Konfigurasi tidak lengkap*\n\nURL GenieACS tidak dikonfigurasi`
@@ -194,8 +195,8 @@ async function addTagByPPPoE(remoteJid, params, sock) {
                 {},
                 {
                     auth: {
-                        username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                        password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                        username: getSetting('genieacs_username', 'admin'),
+                        password: getSetting('genieacs_password', 'admin')
                     }
                 }
             );
@@ -238,7 +239,7 @@ async function addTagByPPPoE(remoteJid, params, sock) {
 async function findDeviceByPPPoE(pppoeUsername) {
     try {
         // Dapatkan URL GenieACS
-        const genieacsUrl = global.appSettings.genieacsUrl || process.env.GENIEACS_URL;
+        const genieacsUrl = getSetting('genieacs_url', 'http://localhost:7557');
         if (!genieacsUrl) {
             logger.error('GenieACS URL not configured');
             return null;
@@ -269,8 +270,8 @@ async function findDeviceByPPPoE(pppoeUsername) {
         // Ambil perangkat dari GenieACS
         const response = await axios.get(`${genieacsUrl}/devices/?query=${encodedQuery}`, {
             auth: {
-                username: global.appSettings.genieacsUsername || process.env.GENIEACS_USERNAME,
-                password: global.appSettings.genieacsPassword || process.env.GENIEACS_PASSWORD
+                username: getSetting('genieacs_username', 'admin'),
+                password: getSetting('genieacs_password', 'admin')
             },
             headers: {
                 'Accept': 'application/json'

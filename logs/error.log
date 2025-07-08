@@ -17,3 +17,11 @@
 2025-07-04 08:53:38 error: Error sending message (attempt 2/3): Connection Closed
 2025-07-04 08:53:39 error: Error sending message (attempt 3/3): Connection Closed
 2025-07-04 08:53:39 error: Failed to send error message: Connection Closed
+2025-07-08 08:22:49 error: Error connecting to Mikrotik: 
+2025-07-08 08:22:49 error: No Mikrotik connection available
+2025-07-08 08:22:49 error: Error connecting to Mikrotik: 
+2025-07-08 08:22:49 error: No Mikrotik connection available for PPPoE monitoring
+2025-07-08 08:23:49 error: Error connecting to Mikrotik: 
+2025-07-08 08:23:49 error: No Mikrotik connection available
+2025-07-08 08:23:49 error: Error connecting to Mikrotik: 
+2025-07-08 08:23:49 error: No Mikrotik connection available for PPPoE monitoring

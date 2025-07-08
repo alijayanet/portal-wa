@@ -1,7 +1,7 @@
 // Modul untuk koneksi dan operasi Mikrotik
 const { RouterOSAPI } = require('node-routeros');
 const { logger } = require('./logger');
-require('dotenv').config();
+const { getSetting } = require('./settingsManager');
 
 let sock = null;
 let mikrotikConnection = null;
@@ -16,10 +16,10 @@ function setSock(sockInstance) {
 async function connectToMikrotik() {
     try {
         // Dapatkan konfigurasi Mikrotik
-        const host = global.appSettings.mikrotikHost || process.env.MIKROTIK_HOST;
-        const port = parseInt(global.appSettings.mikrotikPort || process.env.MIKROTIK_PORT || '8728');
-        const user = global.appSettings.mikrotikUser || process.env.MIKROTIK_USER;
-        const password = global.appSettings.mikrotikPassword || process.env.MIKROTIK_PASSWORD;
+        const host = getSetting('mikrotik_host', '192.168.8.1');
+        const port = parseInt(getSetting('mikrotik_port', '8728'));
+        const user = getSetting('mikrotik_user', 'admin');
+        const password = getSetting('mikrotik_password', 'admin');
         
         if (!host || !user || !password) {
             logger.error('Mikrotik configuration is incomplete');
@@ -485,7 +485,7 @@ async function monitorPPPoEConnections() {
             return;
         }
         // Dapatkan interval monitoring dari konfigurasi
-        const interval = parseInt(global.appSettings.pppoeMonitorInterval || process.env.PPPOE_MONITOR_INTERVAL || '60000');
+        const interval = parseInt(getSetting('pppoe_monitor_interval', '60000'));
         
         // Bersihkan interval sebelumnya jika ada
         if (monitorInterval) {
