@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan - WhatsApp ISP Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .settings-card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .settings-card h5 {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #80bdff;
+        }
+        .save-btn {
+            background: #28a745;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        .save-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/customers">
+                                <i class="fas fa-users"></i> Pelanggan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/network">
+                                <i class="fas fa-network-wired"></i> Jaringan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/settings">
+                                <i class="fas fa-cog"></i> Pengaturan
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Pengaturan Sistem</h1>
+                </div>
+
+                <!-- Settings Cards -->
+                <div class="row">
+                    <!-- WhatsApp Settings -->
+                    <div class="col-md-6">
+                        <div class="card settings-card">
+                            <div class="card-body">
+                                <h5>WhatsApp Settings</h5>
+                                <div class="form-group">
+                                    <label>Admin Number</label>
+                                    <input type="text" id="whatsappAdminNumber" class="form-control" placeholder="Nomor WhatsApp Admin">
+                                </div>
+                                <div class="form-group">
+                                    <label>Keep Alive</label>
+                                    <select id="whatsappKeepAlive" class="form-control">
+                                        <option value="true">Aktif</option>
+                                        <option value="false">Non-Aktif</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Restart on Error</label>
+                                    <select id="whatsappRestartOnError" class="form-control">
+                                        <option value="true">Aktif</option>
+                                        <option value="false">Non-Aktif</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GenieACS Settings -->
+                    <div class="col-md-6">
+                        <div class="card settings-card">
+                            <div class="card-body">
+                                <h5>GenieACS Settings</h5>
+                                <div class="form-group">
+                                    <label>URL</label>
+                                    <input type="text" id="genieacsUrl" class="form-control" placeholder="URL GenieACS">
+                                </div>
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" id="genieacsUsername" class="form-control" placeholder="Username">
+                                </div>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" id="genieacsPassword" class="form-control" placeholder="Password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mikrotik Settings -->
+                    <div class="col-md-6">
+                        <div class="card settings-card">
+                            <div class="card-body">
+                                <h5>Mikrotik Settings</h5>
+                                <div class="form-group">
+                                    <label>Host</label>
+                                    <input type="text" id="mikrotikHost" class="form-control" placeholder="IP Mikrotik">
+                                </div>
+                                <div class="form-group">
+                                    <label>Port</label>
+                                    <input type="number" id="mikrotikPort" class="form-control" placeholder="Port">
+                                </div>
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" id="mikrotikUsername" class="form-control" placeholder="Username">
+                                </div>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" id="mikrotikPassword" class="form-control" placeholder="Password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Server Settings -->
+                    <div class="col-md-6">
+                        <div class="card settings-card">
+                            <div class="card-body">
+                                <h5>Server Settings</h5>
+                                <div class="form-group">
+                                    <label>Port</label>
+                                    <input type="number" id="serverPort" class="form-control" placeholder="Port Server">
+                                </div>
+                                <div class="form-group">
+                                    <label>Host</label>
+                                    <input type="text" id="serverHost" class="form-control" placeholder="Host">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="mt-4">
+                    <button class="save-btn" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Simpan Pengaturan
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Load current settings
+        async function loadSettings() {
+            try {
+                const response = await fetch('/admin/settings');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const settings = data.data;
+                    
+                    // WhatsApp Settings
+                    document.getElementById('whatsappAdminNumber').value = settings.whatsapp_admin_number || '';
+                    document.getElementById('whatsappKeepAlive').value = settings.whatsapp_keep_alive || 'true';
+                    document.getElementById('whatsappRestartOnError').value = settings.whatsapp_restart_on_error || 'true';
+                    
+                    // GenieACS Settings
+                    document.getElementById('genieacsUrl').value = settings.genieacs_url || '';
+                    document.getElementById('genieacsUsername').value = settings.genieacs_username || '';
+                    document.getElementById('genieacsPassword').value = settings.genieacs_password || '';
+                    
+                    // Mikrotik Settings
+                    document.getElementById('mikrotikHost').value = settings.mikrotik_host || '';
+                    document.getElementById('mikrotikPort').value = settings.mikrotik_port || '';
+                    document.getElementById('mikrotikUsername').value = settings.mikrotik_user || '';
+                    document.getElementById('mikrotikPassword').value = settings.mikrotik_password || '';
+                    
+                    // Server Settings
+                    document.getElementById('serverPort').value = settings.server_port || '';
+                    document.getElementById('serverHost').value = settings.server_host || '';
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        // Save settings
+        async function saveSettings() {
+            try {
+                const settings = {
+                    whatsapp_admin_number: document.getElementById('whatsappAdminNumber').value,
+                    whatsapp_keep_alive: document.getElementById('whatsappKeepAlive').value,
+                    whatsapp_restart_on_error: document.getElementById('whatsappRestartOnError').value,
+                    genieacs_url: document.getElementById('genieacsUrl').value,
+                    genieacs_username: document.getElementById('genieacsUsername').value,
+                    genieacs_password: document.getElementById('genieacsPassword').value,
+                    mikrotik_host: document.getElementById('mikrotikHost').value,
+                    mikrotik_port: document.getElementById('mikrotikPort').value,
+                    mikrotik_user: document.getElementById('mikrotikUsername').value,
+                    mikrotik_password: document.getElementById('mikrotikPassword').value,
+                    server_port: document.getElementById('serverPort').value,
+                    server_host: document.getElementById('serverHost').value
+                };
+
+                const response = await fetch('/admin/settings', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ settings })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Pengaturan berhasil disimpan!');
+                } else {
+                    alert('Gagal menyimpan pengaturan');
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert('Terjadi kesalahan saat menyimpan pengaturan');
+            }
+        }
+
+        // Load settings on page load
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<%- include('adminLayout', { 
+    title: 'Mikrotik Management',
+    description: 'Manage Mikrotik Router Settings',
+    currentTab: 'mikrotik'
+}) %>
+
+<div class="row">
+    <!-- Network Status -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Network Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stat-card bg-info text-white">
+                            <div class="stat-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="stat-number" id="activeConnections">0</div>
+                            <div class="stat-label">Active Connections</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card bg-warning text-dark">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-number" id="activeUsers">0</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Router Resources -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Router Resources</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-microchip text-primary"></i>
+                            </div>
+                            <div class="stat-number" id="cpuUsage">0%</div>
+                            <div class="stat-label">CPU Usage</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-memory text-info"></i>
+                            </div>
+                            <div class="stat-number" id="memoryUsage">0%</div>
+                            <div class="stat-label">Memory Usage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface Management -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Interface Management</h5>
+                <div class="btn-group float-end">
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addInterfaceModal">
+                        <i class="fas fa-plus"></i> Add Interface
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>IP Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interfaceList">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PPPoE Management -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">PPPoE Management</h5>
+                <div class="btn-group float-end">
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addPPPoESecretModal">
+                        <i class="fas fa-plus"></i> Add PPPoE Secret
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Profile</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pppoeList">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Interface Modal -->
+<div class="modal fade" id="addInterfaceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Interface</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addInterfaceForm">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" name="type" required>
+                            <option value="ether">Ethernet</option>
+                            <option value="bridge">Bridge</option>
+                            <option value="vlan">VLAN</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">IP Address</label>
+                        <input type="text" class="form-control" name="ipAddress" placeholder="192.168.1.1/24">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addInterface()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add PPPoE Secret Modal -->
+<div class="modal fade" id="addPPPoESecretModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add PPPoE Secret</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPPPoESecretForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Profile</label>
+                        <select class="form-select" name="profile" required>
+                            <option value="default">Default</option>
+                            <option value="default-encryption">Default with Encryption</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addPPPoESecret()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load network status
+function loadNetworkStatus() {
+    fetch('/admin/mikrotik/status')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('activeConnections').textContent = data.activeConnections;
+            document.getElementById('activeUsers').textContent = data.activeUsers;
+            document.getElementById('cpuUsage').textContent = `${data.cpu}%`;
+            document.getElementById('memoryUsage').textContent = `${data.memory}%`;
+        });
+}
+
+// Load interface list
+function loadInterfaceList() {
+    fetch('/admin/mikrotik/interfaces')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('interfaceList');
+            tbody.innerHTML = '';
+            
+            data.interfaces.forEach(interface => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${interface.name}</td>
+                    <td>${interface.type}</td>
+                    <td><span class="badge bg-${interface.status === 'up' ? 'success' : 'danger'}">${interface.status}</span></td>
+                    <td>${interface.ipAddress || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editInterface('${interface.name}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteInterface('${interface.name}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+// Load PPPoE list
+function loadPPPoEList() {
+    fetch('/admin/mikrotik/pppoe')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('pppoeList');
+            tbody.innerHTML = '';
+            
+            data.pppoe.forEach(secret => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${secret.username}</td>
+                    <td>${secret.profile}</td>
+                    <td><span class="badge bg-${secret.status === 'active' ? 'success' : 'danger'}">${secret.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editPPPoE('${secret.username}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deletePPPoE('${secret.username}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+// Add interface
+function addInterface() {
+    const form = document.getElementById('addInterfaceForm');
+    const formData = new FormData(form);
+    
+    fetch('/admin/mikrotik/interfaces', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadInterfaceList();
+            const modal = new bootstrap.Modal(document.getElementById('addInterfaceModal'));
+            modal.hide();
+        }
+    });
+}
+
+// Add PPPoE secret
+function addPPPoESecret() {
+    const form = document.getElementById('addPPPoESecretForm');
+    const formData = new FormData(form);
+    
+    fetch('/admin/mikrotik/pppoe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadPPPoEList();
+            const modal = new bootstrap.Modal(document.getElementById('addPPPoESecretModal'));
+            modal.hide();
+        }
+    });
+}
+
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+    loadNetworkStatus();
+    loadInterfaceList();
+    loadPPPoEList();
+    
+    // Auto-refresh network status
+    setInterval(loadNetworkStatus, 30000);
+});
+</script>

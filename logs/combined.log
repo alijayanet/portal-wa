@@ -4842,3 +4842,171 @@
 2025-07-08 09:38:31 info: Message received
 2025-07-08 09:39:24 info: Monitoring PPPoE connections: 165 active connections
 2025-07-08 09:39:40 info: Message received
+2025-07-08 09:43:17 info: PPPoE monitoring started with interval 60000ms
+2025-07-08 09:43:17 info: Attempting to start server on configured port: 3001
+2025-07-08 09:43:17 info: Mencoba memulai server pada port 3001...
+2025-07-08 09:43:17 info: Server berhasil berjalan pada port 3001
+2025-07-08 09:43:17 info: Environment: development
+2025-07-08 09:43:17 info: WhatsApp socket set in pppoe-notifications module
+2025-07-08 09:43:17 info: WhatsApp socket set in pppoe-commands module
+2025-07-08 09:43:17 info: WhatsApp socket set in genieacs-commands module
+2025-07-08 09:43:17 info: WhatsApp connected successfully
+2025-07-08 09:43:17 error: Error initializing PPPoE monitoring: pppoeNotifications.getSettings is not a function
+2025-07-08 09:43:17 info: RX Power monitoring initialized
+2025-07-08 09:43:17 info: PPPoE monitoring initialized
+2025-07-08 09:44:36 info: PPPoE monitoring started with interval 60000ms
+2025-07-08 09:44:36 info: Attempting to start server on configured port: 3001
+2025-07-08 09:44:36 info: Mencoba memulai server pada port 3001...
+2025-07-08 09:44:36 info: Server berhasil berjalan pada port 3001
+2025-07-08 09:44:36 info: Environment: development
+2025-07-08 09:44:36 info: WhatsApp socket set in pppoe-notifications module
+2025-07-08 09:44:36 info: WhatsApp socket set in pppoe-commands module
+2025-07-08 09:44:36 info: WhatsApp socket set in genieacs-commands module
+2025-07-08 09:44:36 info: WhatsApp connected successfully
+2025-07-08 09:44:36 info: PPPoE monitoring started with interval 60000ms
+2025-07-08 09:44:36 info: RX Power monitoring initialized
+2025-07-08 09:44:36 info: PPPoE monitoring auto-started on initialization
+2025-07-08 09:44:36 info: PPPoE monitoring initialized
+2025-12-18 13:54:43 info: Direktori sesi WhatsApp dibuat: ./whatsapp-session
+2025-12-18 13:54:43 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 13:54:43 info: Attempting to start server on configured port: 3001
+2025-12-18 13:54:43 info: Mencoba memulai server pada port 3001...
+2025-12-18 13:54:43 info: Server berhasil berjalan pada port 3001
+2025-12-18 13:54:43 info: Environment: development
+2025-12-18 13:54:43 info: WhatsApp socket set in pppoe-notifications module
+2025-12-18 13:54:43 info: WhatsApp socket set in pppoe-commands module
+2025-12-18 13:54:43 info: WhatsApp socket set in genieacs-commands module
+2025-12-18 13:54:43 info: WhatsApp connected successfully
+2025-12-18 13:54:43 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 13:54:43 info: RX Power monitoring initialized
+2025-12-18 13:54:43 info: PPPoE monitoring auto-started on initialization
+2025-12-18 13:54:43 info: PPPoE monitoring initialized
+2025-12-18 13:56:31 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 13:56:31 info: Attempting to start server on configured port: 3001
+2025-12-18 13:56:31 info: Mencoba memulai server pada port 3001...
+2025-12-18 13:56:31 info: Server berhasil berjalan pada port 3001
+2025-12-18 13:56:31 info: Environment: development
+2025-12-18 13:56:31 info: WhatsApp socket set in pppoe-notifications module
+2025-12-18 13:56:31 info: WhatsApp socket set in pppoe-commands module
+2025-12-18 13:56:31 info: WhatsApp socket set in genieacs-commands module
+2025-12-18 13:56:31 info: WhatsApp connected successfully
+2025-12-18 13:56:31 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 13:56:31 info: RX Power monitoring initialized
+2025-12-18 13:56:31 info: PPPoE monitoring auto-started on initialization
+2025-12-18 13:56:31 info: PPPoE monitoring initialized
+2025-12-18 13:59:06 info: Direktori sesi WhatsApp dibuat: ./whatsapp-session
+2025-12-18 13:59:06 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 13:59:06 info: Attempting to start server on configured port: 3001
+2025-12-18 13:59:06 info: Mencoba memulai server pada port 3001...
+2025-12-18 13:59:06 info: Server berhasil berjalan pada port 3001
+2025-12-18 13:59:06 info: Environment: development
+2025-12-18 13:59:07 info: WhatsApp socket set in pppoe-notifications module
+2025-12-18 13:59:07 info: WhatsApp socket set in pppoe-commands module
+2025-12-18 13:59:07 info: WhatsApp socket set in genieacs-commands module
+2025-12-18 13:59:07 info: WhatsApp connected successfully
+2025-12-18 13:59:07 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 13:59:07 info: RX Power monitoring initialized
+2025-12-18 13:59:07 info: PPPoE monitoring auto-started on initialization
+2025-12-18 13:59:07 info: PPPoE monitoring initialized
+2025-12-18 14:00:06 info: Connected to Mikrotik at 192.168.8.1:8700
+2025-12-18 14:00:06 info: PPPoE LOGIN:
+2025-12-18 14:00:06 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:00:07 info: PPPoE LOGIN detected: server, iman@, junanto@rawagunda, karban, kendo@tanjungpura, server@arep, dedy@sarkim, dedi@aira, toko@sayur, wiwin@seblak, Uchi, toax, dhea_tile@rawagunda, wardi, newok, mastobari@, memble@, yudi@rawagunda, winata, test, juanda, elis@rawagunda, dasta, pandi@tanjungpura, kama@, nadiva, tino, wadi@rawagunda, suliwa, sarwan, mella, santo, kus, winata@laut, yuni@rawagunda, fitri@sukinih, karsih, aqiel, ejun, lussy, abibah, sumi, rangdu, juniah, nuriyah, opang@tanjungpura, jami@sut, kasdi@rawagunda, indah@tanjungpura, hany@tarsiti, maktub, dayuni, tariman, sandi@rajan, wakeng, yuyun, nurudin, rom@lah, wendy@tanjungpura, salsa, fajar, antony@ps, murba, tinih, damar, eva, denggol, aang, kandar, coyih, alfa, muktar@ompong, brohim, adiiman, suminih@rawagunda, server@ilik, eka, tarci, Tarci@lor, Zea, h.juroh, nina@kesin, erul, rasta, sarjo, darim, toyinah, cecep, memble2, handoko, rudi_, SDNUG1, tibil, yudi, mail, rintem, elvano1, seka, walong@asep, atam, talita, daruni@rawagunda, warung_elisa@laut, andi, gadel, yohan@rawagunda, warungyuni@laut, aang2, sanyo, erni, warsana, raeni, nesa, darim@lor, mardi, aldo, runaeni, kincling, icha, tinih_toko, nalda@rawagunda2, luwih@, ooh, ajri, windah, yogi, RT-KARONI, alam, codet2, codet, wiranto, lisan@banteng, gunawan, kanu, alan@pentud, kasmuri, nana, server_umi, darmini, indra@plentong, waran, khofik@janggar, pabudi@genjong, linah@ujungmulya, durniyah@pegagan, leha, eva@pegagan, sudini@pegagan, soleh@pegagan, sosis@janggar, yusuf, adineasep, ety@pegagan, waidah@pegagan, wendy@genjong, astri@pegagan, umikulsum@janggar, uung@pegagan, F663, intan@ujungmulya, murdani, mangasep@janggar, sang, nani, Endra@genjong1, surminih@pegagan, turidah, dadang@genjong, setiyadi@genjong, nalda@pegagan, opang@pegagan, novita, denihamdani@pegagan, anwar@janggar, yuni@ujungmulya, sarna@pegagan, eryanto@pegagan, abas@pegagan, kurnati, sutara@pegagan, gemblung, kevin, bunga, durta, koriyah, karmanda
+2025-12-18 14:00:08 warn: Error validating WhatsApp number 6281947215703: Connection Closed
+2025-12-18 14:00:08 warn: Skipping invalid WhatsApp number: 6281947215703
+2025-12-18 14:00:08 warn: Error validating WhatsApp number 083807665697: Connection Closed
+2025-12-18 14:00:08 warn: Skipping invalid WhatsApp number: 083807665697
+2025-12-18 14:00:08 warn: Error validating WhatsApp number 082218094778: Connection Closed
+2025-12-18 14:00:08 warn: Skipping invalid WhatsApp number: 082218094778
+2025-12-18 14:00:08 info: PPPoE notification sent to 0/0 valid recipients (3 total)
+2025-12-18 14:00:08 info: PPPoE monitoring: 186 active connections, 186 login, 0 logout
+2025-12-18 14:00:16 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 14:00:16 info: Attempting to start server on configured port: 3001
+2025-12-18 14:00:16 info: Mencoba memulai server pada port 3001...
+2025-12-18 14:00:16 warn: PERINGATAN: Port 3001 sudah digunakan, mencoba port alternatif...
+2025-12-18 14:00:16 info: Mencoba port alternatif: 4001
+2025-12-18 14:00:16 info: Server berhasil berjalan pada port alternatif 4001
+2025-12-18 14:00:16 info: Environment: development
+2025-12-18 14:00:16 info: WhatsApp socket set in pppoe-notifications module
+2025-12-18 14:00:16 info: WhatsApp socket set in pppoe-commands module
+2025-12-18 14:00:16 info: WhatsApp socket set in genieacs-commands module
+2025-12-18 14:00:16 info: WhatsApp connected successfully
+2025-12-18 14:00:16 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 14:00:16 info: RX Power monitoring initialized
+2025-12-18 14:00:16 info: PPPoE monitoring auto-started on initialization
+2025-12-18 14:00:16 info: PPPoE monitoring initialized
+2025-12-18 14:01:06 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:01:16 info: Connected to Mikrotik at 192.168.8.1:8700
+2025-12-18 14:01:16 info: PPPoE LOGIN:
+2025-12-18 14:01:16 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:01:16 info: PPPoE LOGIN detected: server, iman@, junanto@rawagunda, karban, kendo@tanjungpura, server@arep, dedy@sarkim, dedi@aira, toko@sayur, wiwin@seblak, Uchi, toax, dhea_tile@rawagunda, wardi, newok, mastobari@, memble@, yudi@rawagunda, winata, test, juanda, elis@rawagunda, dasta, pandi@tanjungpura, kama@, nadiva, tino, wadi@rawagunda, suliwa, sarwan, mella, santo, kus, winata@laut, yuni@rawagunda, fitri@sukinih, karsih, aqiel, ejun, lussy, abibah, sumi, rangdu, juniah, nuriyah, opang@tanjungpura, jami@sut, kasdi@rawagunda, indah@tanjungpura, hany@tarsiti, maktub, dayuni, tariman, sandi@rajan, wakeng, yuyun, nurudin, rom@lah, wendy@tanjungpura, salsa, fajar, antony@ps, murba, tinih, damar, eva, denggol, aang, kandar, coyih, alfa, muktar@ompong, brohim, adiiman, suminih@rawagunda, server@ilik, eka, tarci, Tarci@lor, Zea, h.juroh, nina@kesin, erul, rasta, sarjo, darim, toyinah, cecep, memble2, handoko, rudi_, SDNUG1, tibil, yudi, mail, rintem, elvano1, seka, walong@asep, atam, talita, daruni@rawagunda, warung_elisa@laut, andi, gadel, yohan@rawagunda, warungyuni@laut, aang2, sanyo, erni, warsana, raeni, nesa, darim@lor, mardi, aldo, runaeni, kincling, icha, tinih_toko, nalda@rawagunda2, luwih@, ooh, ajri, windah, yogi, RT-KARONI, alam, codet2, codet, wiranto, lisan@banteng, gunawan, kanu, alan@pentud, kasmuri, nana, server_umi, darmini, indra@plentong, waran, khofik@janggar, pabudi@genjong, linah@ujungmulya, durniyah@pegagan, leha, eva@pegagan, sudini@pegagan, soleh@pegagan, sosis@janggar, yusuf, adineasep, ety@pegagan, waidah@pegagan, wendy@genjong, astri@pegagan, umikulsum@janggar, uung@pegagan, F663, intan@ujungmulya, murdani, mangasep@janggar, sang, nani, Endra@genjong1, surminih@pegagan, turidah, dadang@genjong, setiyadi@genjong, nalda@pegagan, opang@pegagan, novita, denihamdani@pegagan, anwar@janggar, yuni@ujungmulya, sarna@pegagan, eryanto@pegagan, abas@pegagan, kurnati, sutara@pegagan, gemblung, kevin, bunga, durta, koriyah, karmanda
+2025-12-18 14:01:16 warn: Error validating WhatsApp number 6281947215703: Connection Closed
+2025-12-18 14:01:16 warn: Skipping invalid WhatsApp number: 6281947215703
+2025-12-18 14:01:16 warn: Error validating WhatsApp number 083807665697: Connection Closed
+2025-12-18 14:01:16 warn: Skipping invalid WhatsApp number: 083807665697
+2025-12-18 14:01:16 warn: Error validating WhatsApp number 082218094778: Connection Closed
+2025-12-18 14:01:16 warn: Skipping invalid WhatsApp number: 082218094778
+2025-12-18 14:01:16 info: PPPoE notification sent to 0/0 valid recipients (3 total)
+2025-12-18 14:01:16 info: PPPoE monitoring: 186 active connections, 186 login, 0 logout
+2025-12-18 14:02:06 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:02:16 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:03:06 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:03:16 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:04:06 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:04:16 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:04:39 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 14:04:39 info: Attempting to start server on configured port: 3001
+2025-12-18 14:04:39 info: Mencoba memulai server pada port 3001...
+2025-12-18 14:04:39 info: Server berhasil berjalan pada port 3001
+2025-12-18 14:04:39 info: Environment: development
+2025-12-18 14:04:39 info: WhatsApp socket set in pppoe-notifications module
+2025-12-18 14:04:39 info: WhatsApp socket set in pppoe-commands module
+2025-12-18 14:04:39 info: WhatsApp socket set in genieacs-commands module
+2025-12-18 14:04:39 info: WhatsApp connected successfully
+2025-12-18 14:04:39 info: PPPoE monitoring started with interval 60000ms
+2025-12-18 14:04:39 info: RX Power monitoring initialized
+2025-12-18 14:04:39 info: PPPoE monitoring auto-started on initialization
+2025-12-18 14:04:39 info: PPPoE monitoring initialized
+2025-12-18 14:05:39 info: Connected to Mikrotik at 192.168.8.1:8700
+2025-12-18 14:05:39 info: PPPoE LOGIN:
+2025-12-18 14:05:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:05:39 info: PPPoE LOGIN detected: server, iman@, junanto@rawagunda, karban, kendo@tanjungpura, server@arep, dedy@sarkim, dedi@aira, toko@sayur, wiwin@seblak, Uchi, toax, dhea_tile@rawagunda, wardi, newok, mastobari@, memble@, yudi@rawagunda, winata, test, juanda, elis@rawagunda, dasta, pandi@tanjungpura, kama@, nadiva, tino, wadi@rawagunda, suliwa, sarwan, mella, santo, kus, winata@laut, yuni@rawagunda, fitri@sukinih, karsih, aqiel, ejun, lussy, abibah, sumi, rangdu, juniah, nuriyah, opang@tanjungpura, jami@sut, kasdi@rawagunda, indah@tanjungpura, hany@tarsiti, maktub, dayuni, tariman, sandi@rajan, wakeng, yuyun, nurudin, rom@lah, wendy@tanjungpura, salsa, fajar, antony@ps, murba, tinih, damar, eva, denggol, aang, kandar, coyih, alfa, muktar@ompong, brohim, adiiman, suminih@rawagunda, server@ilik, eka, tarci, Tarci@lor, Zea, h.juroh, nina@kesin, erul, rasta, sarjo, darim, toyinah, cecep, memble2, handoko, rudi_, SDNUG1, tibil, yudi, mail, rintem, elvano1, seka, walong@asep, atam, talita, daruni@rawagunda, warung_elisa@laut, andi, gadel, yohan@rawagunda, warungyuni@laut, aang2, sanyo, erni, warsana, raeni, nesa, darim@lor, mardi, aldo, runaeni, kincling, icha, tinih_toko, nalda@rawagunda2, luwih@, ooh, ajri, windah, yogi, RT-KARONI, alam, codet2, codet, wiranto, lisan@banteng, gunawan, kanu, alan@pentud, kasmuri, nana, server_umi, darmini, indra@plentong, waran, khofik@janggar, pabudi@genjong, linah@ujungmulya, durniyah@pegagan, leha, eva@pegagan, sudini@pegagan, soleh@pegagan, sosis@janggar, yusuf, adineasep, ety@pegagan, waidah@pegagan, wendy@genjong, astri@pegagan, umikulsum@janggar, uung@pegagan, F663, intan@ujungmulya, murdani, mangasep@janggar, sang, nani, Endra@genjong1, surminih@pegagan, turidah, dadang@genjong, setiyadi@genjong, nalda@pegagan, opang@pegagan, novita, denihamdani@pegagan, anwar@janggar, yuni@ujungmulya, sarna@pegagan, eryanto@pegagan, abas@pegagan, kurnati, sutara@pegagan, gemblung, kevin, bunga, durta, koriyah, karmanda
+2025-12-18 14:06:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:06:39 info: PPPoE LOGIN detected: server, iman@, junanto@rawagunda, karban, kendo@tanjungpura, server@arep, dedy@sarkim, dedi@aira, toko@sayur, wiwin@seblak, Uchi, toax, dhea_tile@rawagunda, wardi, newok, mastobari@, memble@, yudi@rawagunda, winata, test, juanda, elis@rawagunda, dasta, pandi@tanjungpura, kama@, nadiva, tino, wadi@rawagunda, suliwa, sarwan, mella, santo, kus, winata@laut, yuni@rawagunda, fitri@sukinih, karsih, aqiel, ejun, lussy, abibah, sumi, rangdu, juniah, nuriyah, opang@tanjungpura, jami@sut, kasdi@rawagunda, indah@tanjungpura, hany@tarsiti, maktub, dayuni, tariman, sandi@rajan, wakeng, yuyun, nurudin, rom@lah, wendy@tanjungpura, salsa, fajar, antony@ps, murba, tinih, damar, eva, denggol, aang, kandar, coyih, alfa, muktar@ompong, brohim, adiiman, suminih@rawagunda, server@ilik, eka, tarci, Tarci@lor, Zea, h.juroh, nina@kesin, erul, rasta, sarjo, darim, toyinah, cecep, memble2, handoko, rudi_, SDNUG1, tibil, yudi, mail, rintem, elvano1, seka, walong@asep, atam, talita, daruni@rawagunda, warung_elisa@laut, andi, gadel, yohan@rawagunda, warungyuni@laut, aang2, sanyo, erni, warsana, raeni, nesa, darim@lor, mardi, aldo, runaeni, kincling, icha, tinih_toko, nalda@rawagunda2, luwih@, ooh, ajri, windah, yogi, RT-KARONI, alam, codet2, codet, wiranto, lisan@banteng, gunawan, kanu, alan@pentud, kasmuri, nana, server_umi, darmini, indra@plentong, waran, khofik@janggar, pabudi@genjong, linah@ujungmulya, durniyah@pegagan, leha, eva@pegagan, sudini@pegagan, soleh@pegagan, sosis@janggar, yusuf, adineasep, ety@pegagan, waidah@pegagan, wendy@genjong, astri@pegagan, umikulsum@janggar, uung@pegagan, F663, intan@ujungmulya, murdani, mangasep@janggar, sang, nani, Endra@genjong1, surminih@pegagan, turidah, dadang@genjong, setiyadi@genjong, nalda@pegagan, opang@pegagan, novita, denihamdani@pegagan, anwar@janggar, yuni@ujungmulya, sarna@pegagan, eryanto@pegagan, abas@pegagan, kurnati, sutara@pegagan, gemblung, kevin, bunga, durta, koriyah, karmanda
+2025-12-18 14:07:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:07:39 info: PPPoE LOGIN detected: server, iman@, junanto@rawagunda, karban, kendo@tanjungpura, server@arep, dedy@sarkim, dedi@aira, toko@sayur, wiwin@seblak, Uchi, toax, dhea_tile@rawagunda, wardi, newok, mastobari@, memble@, yudi@rawagunda, winata, test, juanda, elis@rawagunda, dasta, pandi@tanjungpura, kama@, nadiva, tino, wadi@rawagunda, suliwa, sarwan, mella, santo, kus, winata@laut, yuni@rawagunda, fitri@sukinih, karsih, aqiel, ejun, lussy, abibah, sumi, rangdu, juniah, nuriyah, opang@tanjungpura, jami@sut, kasdi@rawagunda, indah@tanjungpura, hany@tarsiti, maktub, dayuni, tariman, sandi@rajan, wakeng, yuyun, nurudin, rom@lah, wendy@tanjungpura, salsa, fajar, antony@ps, murba, tinih, damar, eva, denggol, aang, kandar, coyih, alfa, muktar@ompong, brohim, adiiman, suminih@rawagunda, server@ilik, eka, tarci, Tarci@lor, Zea, h.juroh, nina@kesin, erul, rasta, sarjo, darim, toyinah, cecep, memble2, handoko, rudi_, SDNUG1, tibil, yudi, mail, rintem, elvano1, seka, walong@asep, atam, talita, daruni@rawagunda, warung_elisa@laut, andi, gadel, yohan@rawagunda, warungyuni@laut, aang2, sanyo, erni, warsana, raeni, nesa, darim@lor, mardi, aldo, runaeni, kincling, icha, tinih_toko, nalda@rawagunda2, luwih@, ooh, ajri, windah, yogi, RT-KARONI, alam, codet2, codet, wiranto, lisan@banteng, gunawan, kanu, alan@pentud, kasmuri, nana, server_umi, darmini, indra@plentong, waran, khofik@janggar, pabudi@genjong, linah@ujungmulya, durniyah@pegagan, leha, eva@pegagan, sudini@pegagan, soleh@pegagan, sosis@janggar, yusuf, adineasep, ety@pegagan, waidah@pegagan, wendy@genjong, astri@pegagan, umikulsum@janggar, uung@pegagan, F663, intan@ujungmulya, murdani, mangasep@janggar, sang, nani, Endra@genjong1, surminih@pegagan, turidah, dadang@genjong, setiyadi@genjong, nalda@pegagan, opang@pegagan, novita, denihamdani@pegagan, anwar@janggar, yuni@ujungmulya, sarna@pegagan, eryanto@pegagan, abas@pegagan, kurnati, sutara@pegagan, gemblung, kevin, bunga, durta, koriyah, karmanda
+2025-12-18 14:08:39 info: PPPoE LOGIN:
+2025-12-18 14:08:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:08:39 info: PPPoE LOGIN detected: server, iman@, junanto@rawagunda, karban, kendo@tanjungpura, server@arep, dedy@sarkim, dedi@aira, toko@sayur, wiwin@seblak, Uchi, toax, dhea_tile@rawagunda, wardi, newok, mastobari@, memble@, yudi@rawagunda, winata, test, juanda, elis@rawagunda, dasta, pandi@tanjungpura, kama@, nadiva, tino, wadi@rawagunda, suliwa, sarwan, mella, santo, kus, winata@laut, yuni@rawagunda, fitri@sukinih, karsih, aqiel, ejun, lussy, abibah, sumi, rangdu, juniah, nuriyah, opang@tanjungpura, jami@sut, kasdi@rawagunda, indah@tanjungpura, hany@tarsiti, maktub, dayuni, tariman, sandi@rajan, wakeng, yuyun, nurudin, rom@lah, wendy@tanjungpura, salsa, fajar, antony@ps, murba, tinih, damar, eva, denggol, aang, kandar, coyih, alfa, muktar@ompong, brohim, adiiman, suminih@rawagunda, server@ilik, eka, tarci, Tarci@lor, Zea, h.juroh, nina@kesin, erul, rasta, sarjo, darim, toyinah, cecep, memble2, handoko, rudi_, SDNUG1, tibil, yudi, mail, rintem, elvano1, seka, walong@asep, atam, talita, daruni@rawagunda, warung_elisa@laut, andi, gadel, yohan@rawagunda, warungyuni@laut, aang2, sanyo, erni, warsana, raeni, nesa, darim@lor, mardi, aldo, runaeni, kincling, icha, tinih_toko, nalda@rawagunda2, luwih@, ooh, ajri, windah, yogi, RT-KARONI, alam, codet2, codet, wiranto, lisan@banteng, gunawan, kanu, alan@pentud, kasmuri, nana, server_umi, darmini, indra@plentong, waran, khofik@janggar, pabudi@genjong, linah@ujungmulya, durniyah@pegagan, leha, eva@pegagan, sudini@pegagan, soleh@pegagan, sosis@janggar, yusuf, adineasep, ety@pegagan, waidah@pegagan, wendy@genjong, astri@pegagan, umikulsum@janggar, uung@pegagan, F663, intan@ujungmulya, murdani, mangasep@janggar, sang, nani, Endra@genjong1, surminih@pegagan, turidah, dadang@genjong, setiyadi@genjong, nalda@pegagan, opang@pegagan, novita, denihamdani@pegagan, anwar@janggar, yuni@ujungmulya, sarna@pegagan, eryanto@pegagan, abas@pegagan, kurnati, sutara@pegagan, gemblung, kevin, bunga, durta, koriyah, karmanda, server@yayan
+2025-12-18 14:08:40 warn: Error validating WhatsApp number 6281947215703: Connection Closed
+2025-12-18 14:08:40 warn: Skipping invalid WhatsApp number: 6281947215703
+2025-12-18 14:08:40 warn: Error validating WhatsApp number 083807665697: Connection Closed
+2025-12-18 14:08:40 warn: Skipping invalid WhatsApp number: 083807665697
+2025-12-18 14:08:40 warn: Error validating WhatsApp number 082218094778: Connection Closed
+2025-12-18 14:08:40 warn: Skipping invalid WhatsApp number: 082218094778
+2025-12-18 14:08:40 info: PPPoE notification sent to 0/0 valid recipients (3 total)
+2025-12-18 14:08:40 info: PPPoE monitoring: 187 active connections, 187 login, 0 logout
+2025-12-18 14:09:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:10:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:11:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:12:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:13:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:14:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:15:39 info: Monitoring PPPoE connections: 187 active connections
+2025-12-18 14:16:39 info: PPPoE LOGOUT:
+2025-12-18 14:16:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:16:40 info: PPPoE LOGOUT detected: soleh@pegagan
+2025-12-18 14:16:40 warn: Error validating WhatsApp number 6281947215703: Connection Closed
+2025-12-18 14:16:40 warn: Skipping invalid WhatsApp number: 6281947215703
+2025-12-18 14:16:40 warn: Error validating WhatsApp number 083807665697: Connection Closed
+2025-12-18 14:16:40 warn: Skipping invalid WhatsApp number: 083807665697
+2025-12-18 14:16:40 warn: Error validating WhatsApp number 082218094778: Connection Closed
+2025-12-18 14:16:40 warn: Skipping invalid WhatsApp number: 082218094778
+2025-12-18 14:16:40 info: PPPoE notification sent to 0/0 valid recipients (3 total)
+2025-12-18 14:16:40 info: PPPoE monitoring: 186 active connections, 0 login, 1 logout
+2025-12-18 14:17:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:18:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:19:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:20:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:21:39 info: Monitoring PPPoE connections: 186 active connections
+2025-12-18 14:22:39 info: Monitoring PPPoE connections: 186 active connections

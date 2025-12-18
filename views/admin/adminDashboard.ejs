@@ -1,0 +1,125 @@
+<%- include('adminLayout', { 
+    title: 'Admin Dashboard',
+    description: 'Overview of ISP Management System',
+    currentTab: 'dashboard'
+}) %>
+
+<div class="row">
+    <!-- Total Devices -->
+    <div class="col-md-4">
+        <div class="stat-card bg-primary text-white">
+            <div class="stat-icon">
+                <i class="fas fa-server"></i>
+            </div>
+            <div class="stat-number" id="totalDevices">0</div>
+            <div class="stat-label">Total Devices</div>
+        </div>
+    </div>
+
+    <!-- Online Devices -->
+    <div class="col-md-4">
+        <div class="stat-card bg-success text-white">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-number" id="onlineDevices">0</div>
+            <div class="stat-label">Devices Online</div>
+        </div>
+    </div>
+
+    <!-- Offline Devices -->
+    <div class="col-md-4">
+        <div class="stat-card bg-danger text-white">
+            <div class="stat-icon">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-number" id="offlineDevices">0</div>
+            <div class="stat-label">Devices Offline</div>
+        </div>
+    </div>
+
+    <!-- PPPoE Statistics -->
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line text-primary"></i>
+            </div>
+            <div class="stat-number" id="pppoeActive">0</div>
+            <div class="stat-label">PPPoE Active</div>
+        </div>
+    </div>
+
+    <!-- Hotspot Statistics -->
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-wifi text-success"></i>
+            </div>
+            <div class="stat-number" id="hotspotActive">0</div>
+            <div class="stat-label">Hotspot Active</div>
+        </div>
+    </div>
+
+    <!-- Router Resources -->
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-memory text-info"></i>
+            </div>
+            <div class="stat-number" id="routerResources">-</div>
+            <div class="stat-label">Router Resources</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityTable">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Update dashboard stats
+function updateStats(data) {
+    if (data && data.stats) {
+        document.getElementById('totalDevices').textContent = data.stats.totalDevices;
+        document.getElementById('onlineDevices').textContent = data.stats.onlineDevices;
+        document.getElementById('offlineDevices').textContent = data.stats.offlineDevices;
+        document.getElementById('pppoeActive').textContent = data.stats.pppoeActive;
+        document.getElementById('hotspotActive').textContent = data.stats.hotspotActive;
+        document.getElementById('routerResources').textContent = `${data.stats.cpu}% CPU, ${data.stats.memory}% Mem`;
+    }
+}
+
+// Fetch initial data
+fetch('/admin/dashboard/data')
+    .then(response => response.json())
+    .then(data => {
+        updateStats(data);
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+</script>

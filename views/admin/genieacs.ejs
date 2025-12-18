@@ -1,0 +1,177 @@
+<%- include('adminLayout', { 
+    title: 'GenieACS Management',
+    description: 'Manage GenieACS devices and configurations',
+    currentTab: 'genieacs'
+}) %>
+
+<div class="row">
+    <!-- Device Search -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Device Search</h5>
+            </div>
+            <div class="card-body">
+                <form id="deviceSearchForm" class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="searchDevice" placeholder="Search by device ID or tag">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="deviceStatus">
+                            <option value="">All Status</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device List -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Device List</h5>
+                <div class="btn-group float-end">
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+                        <i class="fas fa-plus"></i> Add Device
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="refreshDevices()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Device Name</th>
+                                <th>Status</th>
+                                <th>Last Inform</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deviceList">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Device Modal -->
+<div class="modal fade" id="addDeviceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Device</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDeviceForm">
+                    <div class="mb-3">
+                        <label class="form-label">Device ID</label>
+                        <input type="text" class="form-control" name="deviceId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Device Name</label>
+                        <input type="text" class="form-control" name="deviceName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <input type="text" class="form-control" name="tags" placeholder="Separated by comma">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addDevice()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load device list
+function loadDeviceList() {
+    fetch('/admin/genieacs/devices')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('deviceList');
+            tbody.innerHTML = '';
+            
+            data.devices.forEach(device => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${device.deviceId}</td>
+                    <td>${device.deviceName}</td>
+                    <td><span class="badge bg-${device.status === 'online' ? 'success' : 'danger'}">${device.status}</span></td>
+                    <td>${device.lastInform}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editDevice('${device.deviceId}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteDevice('${device.deviceId}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading devices:', error);
+        });
+}
+
+// Search devices
+document.getElementById('deviceSearchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const searchValue = document.getElementById('searchDevice').value;
+    const status = document.getElementById('deviceStatus').value;
+    
+    fetch(`/admin/genieacs/devices?search=${searchValue}&status=${status}`)
+        .then(response => response.json())
+        .then(data => {
+            loadDeviceList(data);
+        });
+});
+
+// Refresh devices
+function refreshDevices() {
+    loadDeviceList();
+}
+
+// Add device
+function addDevice() {
+    const form = document.getElementById('addDeviceForm');
+    const formData = new FormData(form);
+    
+    fetch('/admin/genieacs/devices', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadDeviceList();
+            const modal = new bootstrap.Modal(document.getElementById('addDeviceModal'));
+            modal.hide();
+        }
+    });
+}
+
+// Initial load
+document.addEventListener('DOMContentLoaded', loadDeviceList);
+</script>

@@ -1,0 +1,45 @@
+{
+  "admins": [
+    "628xxxxxxxxxx"
+  ],
+  "admin_enabled": true,
+  "admin_username": "admin",
+  "admin_password": "admin",
+  "genieacs_url": "http://localhost:7557",
+  "genieacs_username": "admin",
+  "genieacs_password": "yourpassword",
+  "mikrotik_host": "192.168.1.1",
+  "mikrotik_port": "8728",
+  "mikrotik_user": "admin",
+  "mikrotik_password": "yourpassword",
+  "main_interface": "ether1-ISP",
+  "pppoe_monitor_enable": true,
+  "technician_numbers": [
+    "628xxxxxxxxxx",
+    "628xxxxxxxxxx"
+  ],
+  "technician_group_id": "",
+  "whatsapp_session_path": "./whatsapp-session",
+  "whatsapp_keep_alive": true,
+  "whatsapp_restart_on_error": true,
+  "pppoe_monitor_interval": 60000,
+  "rx_power_warning": -27,
+  "rx_power_critical": -30,
+  "rx_power_notification_enable": true,
+  "rx_power_notification_interval": 300000,
+  "company_header": "ALIJAYA BOT MANAGEMENT",
+  "footer_info": "Internet Tanpa Batas",
+  "customerPortalOtp": false,
+  "otp_length": 4,
+  "otp_expiry_minutes": 5,
+  "server_port": 3001,
+  "server_host": "localhost",
+  "pppoe_notifications": {
+    "enabled": true,
+    "loginNotifications": true,
+    "logoutNotifications": true,
+    "includeOfflineList": true,
+    "maxOfflineListCount": 20,
+    "monitorInterval": 60000
+  }
+}

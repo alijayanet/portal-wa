@@ -426,6 +426,8 @@ function formatLogoutMessage(logoutUsers, offlineUsers) {
 module.exports = {
     setSock,
     getPPPoENotificationSettings,
+    // Tambahkan alias agar kompatibel:
+    getSettings: getPPPoENotificationSettings,
     setNotificationStatus,
     setLoginNotifications,
     setLogoutNotifications,

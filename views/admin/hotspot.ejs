@@ -1,0 +1,313 @@
+<%- include('adminLayout', { 
+    title: 'Hotspot Management',
+    description: 'Manage Hotspot Users and Profiles',
+    currentTab: 'hotspot'
+}) %>
+
+<div class="row">
+    <!-- Hotspot Statistics -->
+    <div class="col-md-4 mb-4">
+        <div class="stat-card bg-success text-white">
+            <div class="stat-icon">
+                <i class="fas fa-wifi"></i>
+            </div>
+            <div class="stat-number" id="activeUsers">0</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="stat-card bg-primary text-white">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number" id="totalUsers">0</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="stat-card bg-info text-white">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number" id="uptime">-</div>
+            <div class="stat-label">Hotspot Uptime</div>
+        </div>
+    </div>
+
+    <!-- User Management -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">User Management</h5>
+                <div class="btn-group float-end">
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="refreshUsers()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Profile</th>
+                                <th>Uptime</th>
+                                <th>Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userList">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Management -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Profile Management</h5>
+                <div class="btn-group float-end">
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addProfileModal">
+                        <i class="fas fa-plus"></i> Add Profile
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Rate Limit</th>
+                                <th>Idle Timeout</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profileList">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Profile</label>
+                        <select class="form-select" name="profile" required>
+                            <!-- Profiles will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addUser()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Profile Modal -->
+<div class="modal fade" id="addProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProfileForm">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rate Limit</label>
+                        <input type="text" class="form-control" name="rateLimit" placeholder="1024k/1024k">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Idle Timeout</h5m>
+                        <input type="number" class="form-control" name="idleTimeout" placeholder="30">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addProfile()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load hotspot statistics
+function loadStatistics() {
+    fetch('/admin/hotspot/stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('activeUsers').textContent = data.activeUsers;
+            document.getElementById('totalUsers').textContent = data.totalUsers;
+            document.getElementById('uptime').textContent = data.uptime;
+        });
+}
+
+// Load user list
+function loadUserList() {
+    fetch('/admin/hotspot/users')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('userList');
+            tbody.innerHTML = '';
+            
+            data.users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.profile}</td>
+                    <td>${user.uptime}</td>
+                    <td>${user.rate}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editUser('${user.username}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.username}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+// Load profile list
+function loadProfileList() {
+    fetch('/admin/hotspot/profiles')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('profileList');
+            tbody.innerHTML = '';
+            
+            data.profiles.forEach(profile => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${profile.name}</td>
+                    <td>${profile.rateLimit}</td>
+                    <td>${profile.idleTimeout}m</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editProfile('${profile.name}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteProfile('${profile.name}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+// Load profile options for user form
+function loadProfileOptions() {
+    fetch('/admin/hotspot/profiles')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.querySelector('#addUserForm select[name="profile"]');
+            select.innerHTML = '';
+            
+            data.profiles.forEach(profile => {
+                const option = document.createElement('option');
+                option.value = profile.name;
+                option.textContent = profile.name;
+                select.appendChild(option);
+            });
+        });
+}
+
+// Add user
+function addUser() {
+    const form = document.getElementById('addUserForm');
+    const formData = new FormData(form);
+    
+    fetch('/admin/hotspot/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadUserList();
+            const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+            modal.hide();
+        }
+    });
+}
+
+// Add profile
+function addProfile() {
+    const form = document.getElementById('addProfileForm');
+    const formData = new FormData(form);
+    
+    fetch('/admin/hotspot/profiles', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadProfileList();
+            loadProfileOptions();
+            const modal = new bootstrap.Modal(document.getElementById('addProfileModal'));
+            modal.hide();
+        }
+    });
+}
+
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+    loadStatistics();
+    loadUserList();
+    loadProfileList();
+    loadProfileOptions();
+    
+    // Auto-refresh statistics
+    setInterval(loadStatistics, 30000);
+});
+</script>

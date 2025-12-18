@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^6.7.17",
+    "@whiskeysockets/baileys": "^7.0.0-rc.6",
     "axios": "^1.6.7",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.10",
@@ -22,7 +22,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.1.11"
   },
   "engines": {
     "node": ">=14.0.0"

@@ -25,3 +25,4 @@
 2025-07-08 08:23:49 error: No Mikrotik connection available
 2025-07-08 08:23:49 error: Error connecting to Mikrotik: 
 2025-07-08 08:23:49 error: No Mikrotik connection available for PPPoE monitoring
+2025-07-08 09:43:17 error: Error initializing PPPoE monitoring: pppoeNotifications.getSettings is not a function
